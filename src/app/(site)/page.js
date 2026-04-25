@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
+import SummerProducts from '@/components/SummerProducts';
 // import { products } from '@/data/products'; // REMOVED MOCK DATA
 
 export const metadata = {
@@ -27,11 +28,10 @@ export default function HomePage() {
         <div className="hero__content">
           <span className="hero__eyebrow">Premium Streetwear — UK</span>
           <h1 className="hero__title">
-            Straight from<br />MUNI DRIP.
+            BUILT DIFFERENT<br />MUNI DRIP.
           </h1>
           <p className="hero__subtitle">
-            Built from nothing and became something — for the brothers and sisters
-            who came from the same. This is more than fashion.
+            MORE MUNI MORE FREEDOM.
           </p>
           <div className="hero__cta-group">
             <Link href="/collections" className="btn btn-primary">
@@ -46,7 +46,7 @@ export default function HomePage() {
         <div className="hero__scroll-hint" aria-hidden="true">
           <span>SCROLL</span>
           <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 2v12M3 10l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M8 2v12M3 10l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
       </section>
@@ -82,6 +82,8 @@ export default function HomePage() {
           ))}
         </div>
       </div>
+
+      <SummerProducts />
 
       {/* ===== FEATURED PRODUCTS ===== */}
       <section className="section">

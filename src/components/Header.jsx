@@ -55,19 +55,19 @@ export default function Header() {
           <div className="header__actions">
             <button className="header__icon-btn" aria-label="Search">
               <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
-                <circle cx="9" cy="9" r="4.75" stroke="currentColor" strokeWidth="1.5"/>
-                <path stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" d="m12.5 12.5 3.25 3.25"/>
+                <circle cx="9" cy="9" r="4.75" stroke="currentColor" strokeWidth="1.5" />
+                <path stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" d="m12.5 12.5 3.25 3.25" />
               </svg>
             </button>
-            <button 
-              className="header__icon-btn header__cart-btn" 
+            <button
+              className="header__icon-btn header__cart-btn"
               onClick={() => setIsCartOpen(true)}
               aria-label="Cart"
             >
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
-                <path stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
-                <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" strokeWidth="1.5"/>
-                <path stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" d="M16 10a4 4 0 01-8 0"/>
+                <path stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+                <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" strokeWidth="1.5" />
+                <path stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" d="M16 10a4 4 0 01-8 0" />
               </svg>
               {cartCount > 0 && (
                 <span className="header__cart-count">{cartCount}</span>
@@ -89,8 +89,8 @@ export default function Header() {
             aria-label="Close menu"
           >
             <svg viewBox="0 0 14 14" fill="none" width="16" height="16">
-              <path d="M12 2L2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-              <path d="M12 12L2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              <path d="M12 2L2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <path d="M12 12L2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           </button>
           <nav className="mobile-drawer__nav">

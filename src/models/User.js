@@ -116,19 +116,6 @@ const userSchema = new mongoose.Schema(
 userSchema.index({ email: 1 });
 userSchema.index({ createdAt: -1 });
 
-// Middleware to hash password before saving
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
-    return next();
-  }
-
-  try {
-    // Password hashing will be handled by auth service
-    // This is a placeholder for bcrypt integration
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
+userSchema.index({ createdAt: -1 });
 
 export default mongoose.models.User || mongoose.model('User', userSchema);

@@ -1,9 +1,16 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import { useAuthStore } from '@/context/AuthContext';
+import { useState } from 'react';
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { login, isLoading } = useAuthStore();
+  const [error, setError] = useState('');
+  
   const {
     register,
     handleSubmit,
@@ -15,9 +22,14 @@ export default function LoginPage() {
     },
   });
 
-  const onSubmit = (data) => {
-    console.log('Login attempt', data);
-    // TODO: Integrate with backend auth API.
+  const onSubmit = async (data) => {
+    try {
+      setError('');
+      await login(data.email, data.password);
+      router.push('/');
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
@@ -26,6 +38,8 @@ export default function LoginPage() {
         <p className="auth-eyebrow">Welcome Back</p>
         <h1 className="auth-title">Login to Your Account</h1>
         <p className="auth-subtitle">Access orders, profile, and your latest drops.</p>
+
+        {error && <div className="form-error" style={{ marginBottom: '1rem' }}>{error}</div>}
 
         <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
           <label className="auth-label" htmlFor="login-email">Email Address</label>
@@ -52,12 +66,13 @@ export default function LoginPage() {
             placeholder="Enter your password"
             {...register('password', {
               required: 'Password is required',
-              minLength: { value: 8, message: 'Password must be at least 8 characters' },
             })}
           />
           {errors.password && <p className="form-error">{errors.password.message}</p>}
 
-          <button type="submit" className="auth-submit">Login</button>
+          <button type="submit" className="auth-submit" disabled={isLoading}>
+            {isLoading ? 'Logging in...' : 'Login'}
+          </button>
         </form>
 
         <div className="auth-links">

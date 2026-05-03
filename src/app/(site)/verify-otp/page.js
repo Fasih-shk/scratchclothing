@@ -1,52 +1,63 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import { useAuthStore } from '@/context/AuthContext';
+import { useState } from 'react';
 
 export default function VerifyOtpPage() {
+  const router = useRouter();
+  const { user, verifyOTP, resendOTP, isLoading } = useAuthStore();
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [resending, setResending] = useState(false);
+  
   const {
     register,
     handleSubmit,
-    getValues,
     formState: { errors },
   } = useForm({
     defaultValues: {
-      email: '',
       otp: '',
-      newPassword: '',
-      confirmPassword: '',
     },
   });
 
-  const onSubmit = (data) => {
-    console.log('OTP verification', data);
-    // TODO: Verify OTP and update password via backend endpoint.
+  const onSubmit = async (data) => {
+    try {
+      setError('');
+      await verifyOTP(data.otp);
+      setSuccess('Email verified successfully!');
+      setTimeout(() => router.push('/'), 1500);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleResend = async () => {
+    if (!user?.email) return;
+    try {
+      setResending(true);
+      await resendOTP(user.email);
+      setSuccess('OTP sent to your email');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setResending(false);
+    }
   };
 
   return (
     <section className="auth-page">
       <div className="auth-card">
         <p className="auth-eyebrow">Security Check</p>
-        <h1 className="auth-title">OTP Verification</h1>
-        <p className="auth-subtitle">Use the code sent to your email to reset your password.</p>
+        <h1 className="auth-title">Verify Your Email</h1>
+        <p className="auth-subtitle">Enter the 6-digit code sent to your email.</p>
+
+        {error && <div className="form-error" style={{ marginBottom: '1rem' }}>{error}</div>}
+        {success && <div className="form-success" style={{ marginBottom: '1rem' }}>{success}</div>}
 
         <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
-          <label className="auth-label" htmlFor="verify-email">Email Address</label>
-          <input
-            id="verify-email"
-            className="auth-input"
-            type="email"
-            placeholder="you@example.com"
-            {...register('email', {
-              required: 'Email is required',
-              pattern: {
-                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                message: 'Enter a valid email address',
-              },
-            })}
-          />
-          {errors.email && <p className="form-error">{errors.email.message}</p>}
-
           <label className="auth-label" htmlFor="verify-otp">OTP Code</label>
           <input
             id="verify-otp"
@@ -63,37 +74,15 @@ export default function VerifyOtpPage() {
           />
           {errors.otp && <p className="form-error">{errors.otp.message}</p>}
 
-          <label className="auth-label" htmlFor="verify-password">New Password</label>
-          <input
-            id="verify-password"
-            className="auth-input"
-            type="password"
-            placeholder="Enter new password"
-            {...register('newPassword', {
-              required: 'New password is required',
-              minLength: { value: 8, message: 'Password must be at least 8 characters' },
-            })}
-          />
-          {errors.newPassword && <p className="form-error">{errors.newPassword.message}</p>}
-
-          <label className="auth-label" htmlFor="verify-confirm-password">Confirm Password</label>
-          <input
-            id="verify-confirm-password"
-            className="auth-input"
-            type="password"
-            placeholder="Re-enter new password"
-            {...register('confirmPassword', {
-              required: 'Confirm password is required',
-              validate: (value) => value === getValues('newPassword') || 'Passwords do not match',
-            })}
-          />
-          {errors.confirmPassword && <p className="form-error">{errors.confirmPassword.message}</p>}
-
-          <button type="submit" className="auth-submit">Verify and Reset Password</button>
+          <button type="submit" className="auth-submit" disabled={isLoading}>
+            {isLoading ? 'Verifying...' : 'Verify'}
+          </button>
         </form>
 
         <div className="auth-links">
-          <Link href="/forgot-password">Resend code</Link>
+          <button type="button" onClick={handleResend} disabled={resending}>
+            {resending ? 'Sending...' : 'Resend code'}
+          </button>
           <Link href="/login">Back to login</Link>
         </div>
       </div>

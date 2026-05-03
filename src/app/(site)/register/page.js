@@ -1,9 +1,16 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import { useAuthStore } from '@/context/AuthContext';
+import { useState } from 'react';
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const { register: registerUser, isLoading } = useAuthStore();
+  const [error, setError] = useState('');
+  
   const {
     register,
     handleSubmit,
@@ -11,7 +18,8 @@ export default function RegisterPage() {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      fullName: '',
+      firstName: '',
+      lastName: '',
       email: '',
       phone: '',
       password: '',
@@ -19,9 +27,15 @@ export default function RegisterPage() {
     },
   });
 
-  const onSubmit = (data) => {
-    console.log('Register data', data);
-    // TODO: Integrate with backend register API.
+  const onSubmit = async (data) => {
+    try {
+      setError('');
+      const { confirmPassword, ...userData } = data;
+      await registerUser(userData);
+      router.push('/verify-otp');
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
@@ -31,19 +45,34 @@ export default function RegisterPage() {
         <h1 className="auth-title">Create Your Account</h1>
         <p className="auth-subtitle">Register to checkout faster and track your orders.</p>
 
+        {error && <div className="form-error" style={{ marginBottom: '1rem' }}>{error}</div>}
+
         <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
-          <label className="auth-label" htmlFor="register-name">Full Name</label>
+          <label className="auth-label" htmlFor="register-firstName">First Name</label>
           <input
-            id="register-name"
+            id="register-firstName"
             className="auth-input"
             type="text"
-            placeholder="Your full name"
-            {...register('fullName', {
-              required: 'Full name is required',
-              minLength: { value: 2, message: 'Full name must be at least 2 characters' },
+            placeholder="Your first name"
+            {...register('firstName', {
+              required: 'First name is required',
+              minLength: { value: 2, message: 'First name must be at least 2 characters' },
             })}
           />
-          {errors.fullName && <p className="form-error">{errors.fullName.message}</p>}
+          {errors.firstName && <p className="form-error">{errors.firstName.message}</p>}
+
+          <label className="auth-label" htmlFor="register-lastName">Last Name</label>
+          <input
+            id="register-lastName"
+            className="auth-input"
+            type="text"
+            placeholder="Your last name"
+            {...register('lastName', {
+              required: 'Last name is required',
+              minLength: { value: 2, message: 'Last name must be at least 2 characters' },
+            })}
+          />
+          {errors.lastName && <p className="form-error">{errors.lastName.message}</p>}
 
           <label className="auth-label" htmlFor="register-email">Email Address</label>
           <input
@@ -85,14 +114,14 @@ export default function RegisterPage() {
             placeholder="Create a password"
             {...register('password', {
               required: 'Password is required',
-              minLength: { value: 8, message: 'Password must be at least 8 characters' },
+              minLength: { value: 6, message: 'Password must be at least 6 characters' },
             })}
           />
           {errors.password && <p className="form-error">{errors.password.message}</p>}
 
-          <label className="auth-label" htmlFor="register-confirm-password">Confirm Password</label>
+          <label className="auth-label" htmlFor="register-confirmPassword">Confirm Password</label>
           <input
-            id="register-confirm-password"
+            id="register-confirmPassword"
             className="auth-input"
             type="password"
             placeholder="Re-enter password"
@@ -103,12 +132,13 @@ export default function RegisterPage() {
           />
           {errors.confirmPassword && <p className="form-error">{errors.confirmPassword.message}</p>}
 
-          <button type="submit" className="auth-submit">Create Account</button>
+          <button type="submit" className="auth-submit" disabled={isLoading}>
+            {isLoading ? 'Creating account...' : 'Create Account'}
+          </button>
         </form>
 
         <div className="auth-links">
           <Link href="/login">Already have an account? Login</Link>
-          <Link href="/verify-otp">Verify OTP</Link>
         </div>
       </div>
     </section>

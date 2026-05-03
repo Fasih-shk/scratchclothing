@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import ProductCard from '@/components/ProductCard';
 // import { products } from '@/data/products'; // REMOVED MOCK DATA
 
@@ -122,10 +123,12 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="about-strip__image">
-            <img
+            <Image
               src="https://scratchclothing.co.uk/cdn/shop/files/BF747829-B5D3-4CF4-B01C-D6EC8F023868.jpg?v=1772337286&width=800"
               alt="MUNI DRIP"
               className="about-strip__img"
+              fill
+              sizes="(max-width: 900px) 0vw, 40vw"
             />
           </div>
         </div>

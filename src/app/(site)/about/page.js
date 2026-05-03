@@ -16,7 +16,7 @@ export default function AboutPage() {
           MUNI DRIP was built from nothing and became something — for the brothers and sisters
           who came from the same. This is more than fashion. Every stitch, every drop, every
           colourway carries the energy of those who refused to quit. We all started from zero.
-          Let's build together. Welcome to the family.
+          Let&apos;s build together. Welcome to the family.
         </p>
       </div>
 

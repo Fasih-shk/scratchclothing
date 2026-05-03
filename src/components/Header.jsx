@@ -9,6 +9,7 @@ const navLinks = [
   { label: 'SHOP ALL', href: '/collections' },
   { label: 'ABOUT', href: '/about' },
   { label: 'CONTACT', href: '/contact' },
+  { label: 'LOGIN', href: '/login' },
 ];
 
 export default function Header() {
@@ -18,7 +19,7 @@ export default function Header() {
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 

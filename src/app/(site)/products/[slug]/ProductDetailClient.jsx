@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 
 export default function ProductDetailClient({ product, relatedProducts }) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState(null);
+  const [added, setAdded] = useState(false);
   const { addToCart } = useCart();
 
   const handleAddToCart = () => {
@@ -15,6 +17,8 @@ export default function ProductDetailClient({ product, relatedProducts }) {
       return;
     }
     addToCart(product, selectedSize);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1200);
   };
 
   return (
@@ -23,9 +27,11 @@ export default function ProductDetailClient({ product, relatedProducts }) {
         {/* Gallery */}
         <div className="product-detail__gallery">
           <div className="product-detail__main-img">
-            <img
+            <Image
               src={product.images[selectedImage] || product.images[0]}
               alt={product.name}
+              fill
+              sizes="(max-width: 900px) 92vw, 42vw"
             />
           </div>
           {product.images.length > 1 && (
@@ -37,7 +43,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                   onClick={() => setSelectedImage(i)}
                   aria-label={`View image ${i + 1}`}
                 >
-                  <img src={img} alt={`${product.name} view ${i + 1}`} />
+                  <Image src={img} alt={`${product.name} view ${i + 1}`} width={72} height={72} />
                 </button>
               ))}
             </div>
@@ -133,13 +139,14 @@ export default function ProductDetailClient({ product, relatedProducts }) {
           </div>
           <div className="product-grid">
             {relatedProducts.map((p) => (
-              <a key={p.id} href={`/products/${p.slug}`} className="product-card">
+              <Link key={p.id} href={`/products/${p.slug}`} className="product-card">
                 <div className="product-card__image-wrapper">
-                  <img
+                  <Image
                     src={p.images[0]}
                     alt={p.name}
                     className="product-card__image"
-                    loading="lazy"
+                    fill
+                    sizes="(max-width: 600px) 90vw, (max-width: 1200px) 45vw, 25vw"
                   />
                   {p.badge && <span className="product-card__badge">{p.badge}</span>}
                   <div className="product-card__overlay">
@@ -152,7 +159,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                     {p.currency}{p.price.toFixed(2)}
                   </p>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         </section>

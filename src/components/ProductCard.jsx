@@ -5,11 +5,12 @@ export default function ProductCard({ product }) {
   return (
     <Link href={`/products/${product.slug}`} className="product-card">
       <div className="product-card__image-wrapper">
-        <img
+        <Image
           src={product.images[0]}
           alt={product.name}
           className="product-card__image"
-          loading="lazy"
+          fill
+          sizes="(max-width: 600px) 90vw, (max-width: 1200px) 45vw, 25vw"
         />
         {product.badge && (
           <span className="product-card__badge">{product.badge}</span>

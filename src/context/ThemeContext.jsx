@@ -1,43 +1,45 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { useEffect } from 'react';
 
-const ThemeContext = createContext();
+const useThemeStore = create(
+  persist(
+    (set) => ({
+      theme: 'dark',
+      setTheme: (value) => set({ theme: value }),
+      toggleTheme: () =>
+        set((state) => {
+          const themes = ['dark', 'winter', 'summer'];
+          const currentIndex = themes.indexOf(state.theme);
+          const nextIndex = (currentIndex + 1) % themes.length;
+          return { theme: themes[nextIndex] };
+        }),
+    }),
+    {
+      name: 'global-theme',
+      partialize: (state) => ({ theme: state.theme }),
+    }
+  )
+);
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState('dark');
+  const theme = useThemeStore((state) => state.theme);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('global-theme') || 'dark';
-    setTheme(savedTheme);
-    document.documentElement.setAttribute('data-theme', savedTheme);
-  }, []);
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+  }, [theme]);
 
-  const setThemeExplicitly = (newTheme) => {
-    setTheme(newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('global-theme', newTheme);
-  };
-
-  const toggleTheme = () => {
-    const themes = ['dark', 'winter', 'summer'];
-    const currentIndex = themes.indexOf(theme);
-    const nextIndex = (currentIndex + 1) % themes.length;
-    const nextTheme = themes[nextIndex];
-    setThemeExplicitly(nextTheme);
-  };
-
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme: setThemeExplicitly }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return children;
 }
 
 export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
+  const theme = useThemeStore((state) => state.theme);
+  const setTheme = useThemeStore((state) => state.setTheme);
+  const toggleTheme = useThemeStore((state) => state.toggleTheme);
+
+  return { theme, setTheme, toggleTheme };
 }

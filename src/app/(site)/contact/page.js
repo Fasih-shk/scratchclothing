@@ -1,14 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 export default function ContactPage() {
-  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
-  const [submitted, setSubmitted] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitSuccessful },
+  } = useForm({
+    defaultValues: {
+      name: '',
+      email: '',
+      subject: '',
+      message: '',
+    },
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSubmitted(true);
+  const onSubmit = () => {
+    console.log('Contact form submitted');
   };
 
   return (
@@ -16,11 +25,11 @@ export default function ContactPage() {
       <p className="section-eyebrow" style={{ marginBottom: '1rem' }}>Get In Touch</p>
       <h1 className="contact-page__title">Contact Us</h1>
       <p className="contact-page__sub">
-        Got a question about an order? Want to collaborate? Or just want to say what's up?
-        We read every message. Drop us a line below and we'll get back to you within 24–48 hours.
+        Got a question about an order? Want to collaborate? Or just want to say what&apos;s up?
+        We read every message. Drop us a line below and we&apos;ll get back to you within 24–48 hours.
       </p>
 
-      {submitted ? (
+      {isSubmitSuccessful ? (
         <div
           style={{
             textAlign: 'center',
@@ -35,11 +44,11 @@ export default function ContactPage() {
             Message Sent!
           </h2>
           <p style={{ color: 'var(--color-muted)' }}>
-            Thanks for reaching out. We'll be in touch within 24–48 hours.
+            Thanks for reaching out. We&apos;ll be in touch within 24–48 hours.
           </p>
         </div>
       ) : (
-        <form className="contact-form" onSubmit={handleSubmit}>
+        <form className="contact-form" onSubmit={handleSubmit(onSubmit)}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
             <div className="form-group">
               <label htmlFor="contact-name" className="form-label">Name</label>
@@ -48,10 +57,12 @@ export default function ContactPage() {
                 type="text"
                 className="form-input"
                 placeholder="Your name"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                required
+                {...register('name', {
+                  required: 'Name is required',
+                  minLength: { value: 2, message: 'Name must be at least 2 characters' },
+                })}
               />
+              {errors.name && <p className="form-error">{errors.name.message}</p>}
             </div>
             <div className="form-group">
               <label htmlFor="contact-email" className="form-label">Email</label>
@@ -60,10 +71,15 @@ export default function ContactPage() {
                 type="email"
                 className="form-input"
                 placeholder="your@email.com"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                required
+                {...register('email', {
+                  required: 'Email is required',
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: 'Enter a valid email address',
+                  },
+                })}
               />
+              {errors.email && <p className="form-error">{errors.email.message}</p>}
             </div>
           </div>
 
@@ -74,10 +90,12 @@ export default function ContactPage() {
               type="text"
               className="form-input"
               placeholder="What is it about?"
-              value={form.subject}
-              onChange={(e) => setForm({ ...form, subject: e.target.value })}
-              required
+              {...register('subject', {
+                required: 'Subject is required',
+                minLength: { value: 5, message: 'Subject must be at least 5 characters' },
+              })}
             />
+            {errors.subject && <p className="form-error">{errors.subject.message}</p>}
           </div>
 
           <div className="form-group">
@@ -86,10 +104,12 @@ export default function ContactPage() {
               id="contact-message"
               className="form-input"
               placeholder="Your message..."
-              value={form.message}
-              onChange={(e) => setForm({ ...form, message: e.target.value })}
-              required
+              {...register('message', {
+                required: 'Message is required',
+                minLength: { value: 10, message: 'Message must be at least 10 characters' },
+              })}
             />
+            {errors.message && <p className="form-error">{errors.message.message}</p>}
           </div>
 
           <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-start' }}>
@@ -98,7 +118,6 @@ export default function ContactPage() {
         </form>
       )}
 
-      {/* Info cards */}
       <div
         style={{
           display: 'grid',

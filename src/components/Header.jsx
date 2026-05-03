@@ -3,25 +3,34 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
+import { useAuthStore } from '@/context/AuthContext';
 
 const navLinks = [
   { label: 'HOME', href: '/' },
   { label: 'SHOP ALL', href: '/collections' },
   { label: 'ABOUT', href: '/about' },
   { label: 'CONTACT', href: '/contact' },
-  { label: 'LOGIN', href: '/login' },
 ];
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { cartCount, setIsCartOpen } = useCart();
+  const { user, isInitialized, initialize } = useAuthStore();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (!isInitialized) {
+      initialize();
+    }
+  }, [isInitialized, initialize]);
+
+  const isLoggedIn = user && isInitialized;
 
   return (
     <>
@@ -50,6 +59,15 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
+            {isLoggedIn ? (
+              <Link href="/account" className="header__nav-link">
+                ACCOUNT
+              </Link>
+            ) : (
+              <Link href="/login" className="header__nav-link">
+                LOGIN
+              </Link>
+            )}
           </nav>
 
           {/* Actions */}
@@ -105,6 +123,23 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
+            {isLoggedIn ? (
+              <Link
+                href="/account"
+                className="mobile-drawer__link"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                ACCOUNT
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="mobile-drawer__link"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                LOGIN
+              </Link>
+            )}
           </nav>
           <div className="mobile-drawer__footer">
             <p className="mobile-drawer__tagline">MUNI DRIP.<br />Worn by Hustlers.</p>

@@ -22,7 +22,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-<body className={`${inter.variable} ${bricolage.variable} ${inter.className}`} suppressHydrationWarning>
+      <body className={`${inter.variable} ${bricolage.variable} ${inter.className}`} suppressHydrationWarning>
         <AppLoader />
         <ThemeProvider>
           <div className="snow-overlay" />

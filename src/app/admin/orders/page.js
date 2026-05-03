@@ -25,12 +25,34 @@ export default function AdminOrders() {
 
   return (
     <div>
+      <div className="admin-topbar__breadcrumb" style={{ marginBottom: '1rem' }}>
+        <a href="/admin">Home</a>
+        <span className="admin-topbar__breadcrumb-sep">/</span>
+        <span className="admin-topbar__breadcrumb-current">Orders</span>
+      </div>
+
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Orders</h1>
           <p className="admin-page-subtitle">Track order lifecycle from draft to delivery and billing.</p>
         </div>
-        <button className="admin-btn admin-btn--primary">New Sales Order</button>
+        <div className="admin-page-header__actions">
+          <button className="admin-btn">
+            <svg viewBox="0 0 24 24" fill="none" width="14" height="14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Export
+          </button>
+          <button className="admin-btn admin-btn--primary">
+            <svg viewBox="0 0 24 24" fill="none" width="14" height="14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            New Sales Order
+          </button>
+        </div>
       </div>
 
       <div className="admin-card">
@@ -49,7 +71,15 @@ export default function AdminOrders() {
             <option value="Completed">Completed</option>
             <option value="Cancelled">Cancelled</option>
           </select>
-          <button className="admin-btn">Download</button>
+          <div style={{ display: 'none' }} /> {/* Spacer for grid alignment if needed */}
+          <button className="admin-btn">
+            <svg viewBox="0 0 24 24" fill="none" width="14" height="14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Download
+          </button>
         </div>
 
         <div className="admin-table-wrap">

@@ -25,8 +25,13 @@ export default function LoginPage() {
   const onSubmit = async (data) => {
     try {
       setError('');
-      await login(data.email, data.password);
-      router.push('/');
+      const result = await login(data.email, data.password);
+      
+      if (result?.user?.role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/account');
+      }
     } catch (err) {
       setError(err.message);
     }

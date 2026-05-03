@@ -64,7 +64,7 @@ export const useAuthStore = create(
             isLoading: false,
           });
           
-          return { success: true };
+          return { success: true, user: data.user };
         } catch (error) {
           set({ isLoading: false });
           throw error;

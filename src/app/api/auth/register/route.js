@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 import { hashPassword, generateOTP, generateToken } from '@/lib/auth';
-import { sendVerificationEmail } from '@/lib/email';
+import { sendVerificationEmail, sendEmail } from '@/lib/email';
 
 export async function POST(request) {
   try {
@@ -50,6 +50,15 @@ export async function POST(request) {
     });
 
     await sendVerificationEmail(user.email, otp);
+
+    const adminEmail = process.env.EMAIL_USER;
+    if (adminEmail) {
+      await sendEmail({
+        to: adminEmail,
+        subject: 'New User Registration',
+        html: `<p>A new user has registered!</p><p><strong>Name:</strong> ${firstName} ${lastName}</p><p><strong>Email:</strong> ${email}</p><p><strong>Phone:</strong> ${phone}</p>`,
+      });
+    }
 
     const token = generateToken({
       userId: user._id,

@@ -4,21 +4,34 @@ import ProductCard from '@/components/ProductCard';
 import SummerProducts from '@/components/SummerProducts';
 // import { products } from '@/data/products'; // REMOVED MOCK DATA
 
+import connectDB from '@/lib/mongodb';
+import Product from '@/models/Product';
+
 export const metadata = {
   title: 'Scratch® | Started from Scratch, Worn by Hustlers',
   description:
     'Scratch was built from nothing and became something. Premium streetwear for those who came from nothing and built their empire.',
 };
 
-const featuredProducts = []; // PREPARED FOR FRAPPE API
-const products = []; // PREPARED FOR FRAPPE API
-
 const marqueeItems = [
   'NEW ARRIVALS', 'UAE to UK', 'PREMIUM STREETWEAR', 'FREE SHIPPING OVER £150',
   'MUNI ISLAND COLLECTION', 'MADE FOR THE CULTURE', 'LIMITED DROPS',
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  await connectDB();
+  
+  // Fetch featured products
+  const featuredProducts = await Product.find({ isFeatured: true, status: 'active' })
+    .sort({ createdAt: -1 })
+    .limit(8)
+    .lean();
+
+  // Fetch recent products for full collection
+  const allProducts = await Product.find({ status: 'active' })
+    .sort({ createdAt: -1 })
+    .limit(16)
+    .lean();
   return (
     <>
       {/* ===== HERO ===== */}
@@ -99,9 +112,15 @@ export default function HomePage() {
         </div>
 
         <div className="product-grid">
-          {featuredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {featuredProducts.length > 0 ? (
+            featuredProducts.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))
+          ) : (
+            <p className="admin-text-muted" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem' }}>
+              No featured products found.
+            </p>
+          )}
         </div>
       </section>
 
@@ -145,9 +164,15 @@ export default function HomePage() {
           </div>
         </div>
         <div className="product-grid">
-          {products.slice(8).map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {allProducts.length > 0 ? (
+            allProducts.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))
+          ) : (
+            <p className="admin-text-muted" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem' }}>
+              Collection coming soon.
+            </p>
+          )}
         </div>
       </section>
     </>

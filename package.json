@@ -2,6 +2,7 @@
   "name": "scratch-clothing",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,9 +10,9 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "frappe-react-sdk": "^1.14.0",
     "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.2.0",
+    "mongoose": "^9.6.1",
     "next": "16.2.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",

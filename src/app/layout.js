@@ -1,7 +1,6 @@
 import { Bricolage_Grotesque, Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/context/ThemeContext';
-import { FrappeAppProvider } from '@/context/FrappeContext';
 import AppLoader from '@/components/AppLoader';
 
 const inter = Inter({
@@ -23,15 +22,13 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${bricolage.variable} ${inter.className}`} suppressHydrationWarning>
+<body className={`${inter.variable} ${bricolage.variable} ${inter.className}`} suppressHydrationWarning>
         <AppLoader />
-        <FrappeAppProvider>
-          <ThemeProvider>
-            <div className="snow-overlay" />
-            <div className="sun-flare" />
-            {children}
-          </ThemeProvider>
-        </FrappeAppProvider>
+        <ThemeProvider>
+          <div className="snow-overlay" />
+          <div className="sun-flare" />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

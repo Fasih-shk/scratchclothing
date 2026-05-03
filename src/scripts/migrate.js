@@ -7,18 +7,18 @@
  * - This creates all collections and indexes automatically on first connection
  */
 
-import connectDB from '@/lib/mongodb';
-import User from '@/models/User';
-import Category from '@/models/Category';
-import Product from '@/models/Product';
-import Inventory from '@/models/Inventory';
-import Cart from '@/models/Cart';
-import Order from '@/models/Order';
-import Review from '@/models/Review';
-import Coupon from '@/models/Coupon';
-import Return from '@/models/Return';
-import Address from '@/models/Address';
-import InventoryHistory from '@/models/InventoryHistory';
+import connectDB from '../lib/mongodb.js';
+import User from '../models/User.js';
+import Category from '../models/Category.js';
+import Product from '../models/Product.js';
+import Inventory from '../models/Inventory.js';
+import Cart from '../models/Cart.js';
+import Order from '../models/Order.js';
+import Review from '../models/Review.js';
+import Coupon from '../models/Coupon.js';
+import Return from '../models/Return.js';
+import Address from '../models/Address.js';
+import InventoryHistory from '../models/InventoryHistory.js';
 
 async function runMigrations() {
   try {
@@ -26,77 +26,7 @@ async function runMigrations() {
     await connectDB();
     console.log('✅ Connected to MongoDB');
 
-    // Create collections and indexes
-    console.log('\n📝 Creating collections and indexes...');
-
-    // User indexes
-    await User.collection.createIndex({ email: 1 });
-    await User.collection.createIndex({ createdAt: -1 });
-    console.log('✅ User indexes created');
-
-    // Category indexes
-    await Category.collection.createIndex({ slug: 1 });
-    await Category.collection.createIndex({ parentCategory: 1 });
-    await Category.collection.createIndex({ displayOrder: 1 });
-    console.log('✅ Category indexes created');
-
-    // Product indexes
-    await Product.collection.createIndex({ name: 'text', description: 'text' });
-    await Product.collection.createIndex({ slug: 1 });
-    await Product.collection.createIndex({ category: 1 });
-    await Product.collection.createIndex({ collection: 1 });
-    await Product.collection.createIndex({ status: 1, isFeatured: 1 });
-    await Product.collection.createIndex({ createdAt: -1 });
-    console.log('✅ Product indexes created');
-
-    // Cart indexes
-    await Cart.collection.createIndex({ userId: 1 });
-    await Cart.collection.createIndex({ status: 1, updatedAt: -1 });
-    console.log('✅ Cart indexes created');
-
-    // Order indexes
-    await Order.collection.createIndex({ orderNumber: 1 });
-    await Order.collection.createIndex({ userId: 1 });
-    await Order.collection.createIndex({ status: 1, createdAt: -1 });
-    await Order.collection.createIndex({ paymentStatus: 1 });
-    await Order.collection.createIndex({ email: 1 });
-    console.log('✅ Order indexes created');
-
-    // Review indexes
-    await Review.collection.createIndex({ productId: 1, status: 1 });
-    await Review.collection.createIndex({ userId: 1 });
-    await Review.collection.createIndex({ rating: 1 });
-    await Review.collection.createIndex({ createdAt: -1 });
-    console.log('✅ Review indexes created');
-
-    // Inventory indexes
-    await Inventory.collection.createIndex({ productId: 1 });
-    await Inventory.collection.createIndex({ isLowStock: 1 });
-    await Inventory.collection.createIndex({ isOutOfStock: 1 });
-    console.log('✅ Inventory indexes created');
-
-    // InventoryHistory indexes
-    await InventoryHistory.collection.createIndex({ productId: 1, createdAt: -1 });
-    await InventoryHistory.collection.createIndex({ type: 1, createdAt: -1 });
-    await InventoryHistory.collection.createIndex({ orderId: 1 });
-    console.log('✅ InventoryHistory indexes created');
-
-    // Coupon indexes
-    await Coupon.collection.createIndex({ code: 1 });
-    await Coupon.collection.createIndex({ isActive: 1, endDate: 1 });
-    await Coupon.collection.createIndex({ startDate: 1, endDate: 1 });
-    console.log('✅ Coupon indexes created');
-
-    // Return indexes
-    await Return.collection.createIndex({ returnNumber: 1 });
-    await Return.collection.createIndex({ orderId: 1 });
-    await Return.collection.createIndex({ userId: 1 });
-    await Return.collection.createIndex({ status: 1, createdAt: -1 });
-    console.log('✅ Return indexes created');
-
-    // Address indexes
-    await Address.collection.createIndex({ userId: 1 });
-    console.log('✅ Address indexes created');
+    console.log('\n📝 Indexes will be created automatically by Mongoose on first use');
 
     console.log('\n🌱 Seeding sample data...');
     await seedSampleData();

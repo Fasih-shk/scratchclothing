@@ -34,14 +34,14 @@ export default function ThemeSelector() {
               color: theme === t.id ? '#000' : 'var(--color-white)',
             }}
           >
-            <div 
-              style={{ 
-                width: '24px', 
-                height: '24px', 
-                borderRadius: '50%', 
+            <div
+              style={{
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
                 background: t.color,
                 border: '1px solid rgba(255,255,255,0.1)'
-              }} 
+              }}
             />
             <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{t.name}</span>
             {theme === t.id && (

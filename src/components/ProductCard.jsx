@@ -6,8 +6,8 @@ export default function ProductCard({ product }) {
     <Link href={`/products/${product.slug}`} className="product-card">
       <div className="product-card__image-wrapper">
         <Image
-          src={product.images[0]?.url || '/placeholder.jpg'}
-          alt={product.images[0]?.alt || product.name}
+          src={typeof product.images[0] === 'string' ? product.images[0] : (product.images[0]?.url || '/placeholder.jpg')}
+          alt={typeof product.images[0] === 'object' ? product.images[0]?.alt : product.name}
           className="product-card__image"
           fill
           sizes="(max-width: 600px) 90vw, (max-width: 1200px) 45vw, 25vw"

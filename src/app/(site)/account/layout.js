@@ -24,6 +24,8 @@ export default function AccountLayout({ children }) {
   useEffect(() => {
     if (isInitialized && !user) {
       router.push('/login');
+    } else if (isInitialized && user && user.role === 'admin') {
+      router.push('/admin');
     }
   }, [user, isInitialized, router]);
 

@@ -21,17 +21,41 @@ export default function ProductDetailClient({ product, relatedProducts }) {
     setTimeout(() => setAdded(false), 1200);
   };
 
+  const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
+  const [isZooming, setIsZooming] = useState(false);
+
+  const handleMouseMove = (e) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setZoomPos({ x, y });
+  };
+
   return (
     <div className="product-detail">
       <div className="product-detail__grid">
         {/* Gallery */}
         <div className="product-detail__gallery">
-          <div className="product-detail__main-img">
+          <div 
+            className="product-detail__main-img"
+            style={{ position: 'relative', overflow: 'hidden', cursor: 'zoom-in' }}
+            onMouseMove={handleMouseMove}
+            onMouseEnter={() => setIsZooming(true)}
+            onMouseLeave={() => setIsZooming(false)}
+          >
             <Image
-              src={product.images[selectedImage] || product.images[0]}
-              alt={product.name}
+              src={product.images[selectedImage]?.url || product.images[0]?.url || '/placeholder.jpg'}
+              alt={product.images[selectedImage]?.alt || product.name}
               fill
               sizes="(max-width: 900px) 92vw, 42vw"
+              priority
+              style={isZooming ? {
+                transform: 'scale(2.2)',
+                transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
+                transition: 'transform 0.1s ease-out'
+              } : {
+                transition: 'transform 0.3s ease-out'
+              }}
             />
           </div>
           {product.images.length > 1 && (
@@ -43,7 +67,13 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                   onClick={() => setSelectedImage(i)}
                   aria-label={`View image ${i + 1}`}
                 >
-                  <Image src={img} alt={`${product.name} view ${i + 1}`} width={72} height={72} />
+                  <Image 
+                    src={img.url} 
+                    alt={img.alt || `${product.name} view ${i + 1}`} 
+                    width={72} 
+                    height={72} 
+                    className="product-detail__thumb-img"
+                  />
                 </button>
               ))}
             </div>
@@ -82,17 +112,29 @@ export default function ProductDetailClient({ product, relatedProducts }) {
             )}
           </p>
           <div className="product-detail__sizes">
-            {product.variants.map((v) => (
-              <button
-                key={v.size}
-                className={`size-btn ${selectedSize === v.size ? 'size-btn--selected' : ''} ${!v.inStock ? 'size-btn--oos' : ''}`}
-                onClick={() => v.inStock && setSelectedSize(v.size)}
-                disabled={!v.inStock}
-                aria-label={`Size ${v.size}${!v.inStock ? ' - Out of stock' : ''}`}
-              >
-                {v.size}
-              </button>
-            ))}
+            {product.variants?.[0]?.options?.length > 0 ? (
+              product.variants[0].options.map((opt) => (
+                <button
+                  key={opt.value}
+                  className={`size-btn ${selectedSize === opt.value ? 'size-btn--selected' : ''}`}
+                  onClick={() => setSelectedSize(opt.value)}
+                  aria-label={`Size ${opt.value}`}
+                >
+                  {opt.value}
+                </button>
+              ))
+            ) : (
+              ['S', 'M', 'L', 'XL'].map((size) => (
+                <button
+                  key={size}
+                  className={`size-btn ${selectedSize === size ? 'size-btn--selected' : ''}`}
+                  onClick={() => setSelectedSize(size)}
+                  aria-label={`Size ${size}`}
+                >
+                  {size}
+                </button>
+              ))
+            )}
           </div>
 
           {/* Add to Cart */}
@@ -117,8 +159,9 @@ export default function ProductDetailClient({ product, relatedProducts }) {
             <span>🚀 Free shipping on orders over £150</span>
             <span>♻️ Ethically produced and sourced</span>
             <span>🔒 Secure checkout guaranteed</span>
-            <span>📦 Category: {product.category}</span>
-            {product.tags.length > 0 && (
+            <span>📦 Category: {product.category?.name || 'Uncategorized'}</span>
+            {product.sku && <span>🆔 SKU: {product.sku}</span>}
+            {product.tags?.length > 0 && (
               <span>🏷️ {product.tags.join(', ')}</span>
             )}
           </div>
@@ -139,11 +182,11 @@ export default function ProductDetailClient({ product, relatedProducts }) {
           </div>
           <div className="product-grid">
             {relatedProducts.map((p) => (
-              <Link key={p.id} href={`/products/${p.slug}`} className="product-card">
+              <Link key={p._id} href={`/products/${p.slug}`} className="product-card">
                 <div className="product-card__image-wrapper">
                   <Image
-                    src={p.images[0]}
-                    alt={p.name}
+                    src={p.images[0]?.url || '/placeholder.jpg'}
+                    alt={p.images[0]?.alt || p.name}
                     className="product-card__image"
                     fill
                     sizes="(max-width: 600px) 90vw, (max-width: 1200px) 45vw, 25vw"

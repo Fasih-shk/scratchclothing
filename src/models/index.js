@@ -1,12 +1,12 @@
 // Export all Mongoose models
-export { default as User } from './User';
-export { default as Address } from './Address';
-export { default as Product } from './Product';
-export { default as Category } from './Category';
-export { default as Cart } from './Cart';
-export { default as Order } from './Order';
-export { default as Review } from './Review';
-export { default as Inventory } from './Inventory';
-export { default as InventoryHistory } from './InventoryHistory';
-export { default as Coupon } from './Coupon';
-export { default as Return } from './Return';
+export { default as User } from './User.js';
+export { default as Address } from './Address.js';
+export { default as Product } from './Product.js';
+export { default as Category } from './Category.js';
+export { default as Cart } from './Cart.js';
+export { default as Order } from './Order.js';
+export { default as Review } from './Review.js';
+export { default as Inventory } from './Inventory.js';
+export { default as InventoryHistory } from './InventoryHistory.js';
+export { default as Coupon } from './Coupon.js';
+export { default as Return } from './Return.js';

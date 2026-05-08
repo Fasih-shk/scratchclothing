@@ -19,19 +19,33 @@ const marqueeItems = [
 ];
 
 export default async function HomePage() {
-  await connectDB();
-  
-  // Fetch featured products
-  const featuredProducts = await Product.find({ isFeatured: true, status: 'active' })
-    .sort({ createdAt: -1 })
-    .limit(8)
-    .lean();
+  let featuredProducts = [];
+  let allProducts = [];
+  let errorMsg = null;
 
-  // Fetch recent products for full collection
-  const allProducts = await Product.find({ status: 'active' })
-    .sort({ createdAt: -1 })
-    .limit(16)
-    .lean();
+  try {
+    await connectDB();
+    
+    // Fetch featured products
+    const featuredProductsRaw = await Product.find({ isFeatured: true, status: 'active' })
+      .sort({ createdAt: -1 })
+      .limit(8)
+      .lean();
+    
+    featuredProducts = JSON.parse(JSON.stringify(featuredProductsRaw));
+
+    // Fetch recent products for full collection
+    const allProductsRaw = await Product.find({ status: 'active' })
+      .sort({ createdAt: -1 })
+      .limit(16)
+      .lean();
+
+    allProducts = JSON.parse(JSON.stringify(allProductsRaw));
+  } catch (error) {
+    console.error('Database connection error:', error);
+    errorMsg = 'Unable to connect to the database. Please check your connection and IP whitelist.';
+  }
+
   return (
     <>
       {/* ===== HERO ===== */}
@@ -111,12 +125,18 @@ export default async function HomePage() {
           </Link>
         </div>
 
+        {errorMsg && (
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#ff4d4d', background: 'rgba(255, 77, 77, 0.1)', borderRadius: '8px', margin: '2rem 0' }}>
+            {errorMsg}
+          </div>
+        )}
+
         <div className="product-grid">
           {featuredProducts.length > 0 ? (
             featuredProducts.map((product) => (
               <ProductCard key={product._id} product={product} />
             ))
-          ) : (
+          ) : !errorMsg && (
             <p className="admin-text-muted" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem' }}>
               No featured products found.
             </p>
@@ -168,7 +188,7 @@ export default async function HomePage() {
             allProducts.map((product) => (
               <ProductCard key={product._id} product={product} />
             ))
-          ) : (
+          ) : !errorMsg && (
             <p className="admin-text-muted" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem' }}>
               Collection coming soon.
             </p>

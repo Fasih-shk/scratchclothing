@@ -7,7 +7,7 @@ const API_URL = '/api/auth';
 
 async function fetchAPI(endpoint, options = {}) {
   const token = useAuthStore.getState().token;
-  
+
   const res = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers: {
@@ -18,11 +18,11 @@ async function fetchAPI(endpoint, options = {}) {
   });
 
   const data = await res.json();
-  
+
   if (!res.ok) {
     throw new Error(data.error || 'Something went wrong');
   }
-  
+
   return data;
 }
 
@@ -51,20 +51,19 @@ export const useAuthStore = create(
 
       login: async (email, password) => {
         set({ isLoading: true });
-        
+
         try {
           const data = await fetchAPI('/login', {
             method: 'POST',
             body: JSON.stringify({ email, password }),
           });
-          
+
           set({
             user: data.user,
-            token: data.token,
+            token: data.token || null,
             isLoading: false,
           });
-          
-          return { success: true, user: data.user };
+          return { success: true, user: data.user, requiresOTP: data.requiresOTP };
         } catch (error) {
           set({ isLoading: false });
           throw error;
@@ -73,19 +72,19 @@ export const useAuthStore = create(
 
       register: async (userData) => {
         set({ isLoading: true });
-        
+
         try {
           const data = await fetchAPI('/register', {
             method: 'POST',
             body: JSON.stringify(userData),
           });
-          
+
           set({
             user: data.user,
             token: data.token,
             isLoading: false,
           });
-          
+
           return { success: true };
         } catch (error) {
           set({ isLoading: false });
@@ -99,19 +98,19 @@ export const useAuthStore = create(
         } catch (error) {
           console.error('Logout error:', error);
         }
-        
+
         set({ user: null, token: null });
       },
 
       forgotPassword: async (email) => {
         set({ isLoading: true });
-        
+
         try {
           const data = await fetchAPI('/forgot-password', {
             method: 'POST',
             body: JSON.stringify({ email }),
           });
-          
+
           set({ isLoading: false });
           return data;
         } catch (error) {
@@ -122,13 +121,13 @@ export const useAuthStore = create(
 
       resetPassword: async (token, newPassword) => {
         set({ isLoading: true });
-        
+
         try {
           const data = await fetchAPI('/reset-password', {
             method: 'POST',
             body: JSON.stringify({ token, newPassword }),
           });
-          
+
           set({ isLoading: false });
           return data;
         } catch (error) {
@@ -140,21 +139,21 @@ export const useAuthStore = create(
       verifyOTP: async (otp) => {
         const user = get().user;
         if (!user) throw new Error('No user found');
-        
+
         set({ isLoading: true });
-        
+
         try {
           const data = await fetchAPI('/verify-otp', {
             method: 'POST',
             body: JSON.stringify({ otp, userId: user._id }),
           });
-          
+
           set({
             user: { ...user, isVerified: true },
             token: data.token,
             isLoading: false,
           });
-          
+
           return { success: true };
         } catch (error) {
           set({ isLoading: false });
@@ -164,13 +163,13 @@ export const useAuthStore = create(
 
       resendOTP: async (email) => {
         set({ isLoading: true });
-        
+
         try {
           const data = await fetchAPI('/resend-otp', {
             method: 'POST',
             body: JSON.stringify({ email }),
           });
-          
+
           set({ isLoading: false });
           return data;
         } catch (error) {

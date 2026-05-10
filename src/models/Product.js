@@ -36,6 +36,11 @@ const productSchema = new mongoose.Schema(
       enum: ['mens', 'womens', 'unisex', 'winter', 'summer'],
       index: true,
     },
+    session: {
+      type: String,
+      enum: ['winter', 'summer'],
+      index: true,
+    },
 
     // Pricing
     price: {

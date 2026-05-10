@@ -83,7 +83,7 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { name, slug, description, category, price, originalPrice, discount, discountType, currency, images, sku, status, isFeatured, isNewArrival, collection, inventory, tags, shortDescription, material, brand, lowStockThreshold, trackInventory, seoTitle, seoDescription, seoKeywords, requiresShipping } = body;
+    const { name, slug, description, category, price, originalPrice, discount, discountType, currency, images, sku, status, isFeatured, isNewArrival, collection, session, inventory, tags, shortDescription, material, brand, lowStockThreshold, trackInventory, seoTitle, seoDescription, seoKeywords, requiresShipping } = body;
 
     // Validation
     if (!name || !slug || !description || !category || price === undefined) {
@@ -140,6 +140,7 @@ export async function POST(request) {
       isFeatured: isFeatured || false,
       isNewArrival: isNewArrival || false,
       collection: collection || undefined,
+      session: session || undefined,
       tags: tags || [],
       shortDescription: shortDescription || undefined,
       material: material || undefined,

@@ -1,0 +1,47 @@
+PRODUCT FORM FIELDS (Add/Edit Product)
+========================================
+Source: src/app/admin/products/page.js — ProductModal component
+
+
+GENERAL INFORMATION
+-------------------
+Name            | text     | required
+SKU             | text     | optional (unique)
+Brand           | text     | optional
+Short Desc.     | text     | optional
+Long Desc.      | textarea | required
+
+PRODUCT IMAGES
+--------------
+Images          | file upload | optional (PNG, JPG, WEBP, up to 5MB each)
+
+PRICING & INVENTORY
+-------------------
+Price           | number (0.01 step) | required
+Original Price  | number (0.01 step) | optional
+Discount %      | number (0-100)     | optional
+Currency        | select             | GBP / USD / EUR (default: GBP)
+Stock           | number             | optional (default: 0)
+Low Stock Alert | number             | optional (default: 10)
+
+CATEGORIZATION
+--------------
+Category        | select (from DB) | required
+Collection      | select           | Mens / Womens / Unisex / Winter / Summer
+Material        | text             | optional
+Status          | select           | Active / Inactive / Discontinued (default: Active)
+
+SEO
+---
+SEO Title       | text | optional
+SEO Description | text | optional
+
+FLAGS (checkboxes)
+------------------
+☐ Featured Product
+☐ New Arrival
+☑ Track Stock (default: on)
+
+
+REQUIRED BY API: name, slug, description, category, price
+AUTO-GENERATED:  slug (from name, if empty on create)

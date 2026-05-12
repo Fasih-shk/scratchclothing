@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import ProductCard from '@/components/ProductCard';
-import SummerProducts from '@/components/SummerProducts';
+import SeasonalProducts from '@/components/SeasonalProducts';
 // import { products } from '@/data/products'; // REMOVED MOCK DATA
 
 import connectDB from '@/lib/mongodb';
@@ -21,13 +21,15 @@ const marqueeItems = [
 export default async function HomePage() {
   let featuredProducts = [];
   let allProducts = [];
+  let winterProducts = [];
+  let summerProducts = [];
   let errorMsg = null;
 
   try {
     await connectDB();
     
     // Fetch featured products
-    const featuredProductsRaw = await Product.find({ isFeatured: true, status: 'active' })
+    const featuredProductsRaw = await Product.find({ isFeatured: true, status: 'active', session: { $exists: false } })
       .sort({ createdAt: -1 })
       .limit(8)
       .lean();
@@ -35,12 +37,19 @@ export default async function HomePage() {
     featuredProducts = JSON.parse(JSON.stringify(featuredProductsRaw));
 
     // Fetch recent products for full collection
-    const allProductsRaw = await Product.find({ status: 'active' })
+    const allProductsRaw = await Product.find({ status: 'active', session: { $exists: false } })
       .sort({ createdAt: -1 })
       .limit(16)
       .lean();
 
     allProducts = JSON.parse(JSON.stringify(allProductsRaw));
+
+    // Fetch seasonal products
+    const winterProductsRaw = await Product.find({ status: 'active', session: 'winter' }).lean();
+    winterProducts = JSON.parse(JSON.stringify(winterProductsRaw));
+
+    const summerProductsRaw = await Product.find({ status: 'active', session: 'summer' }).lean();
+    summerProducts = JSON.parse(JSON.stringify(summerProductsRaw));
   } catch (error) {
     console.error('Database connection error:', error);
     errorMsg = 'Unable to connect to the database. Please check your connection and IP whitelist.';
@@ -111,8 +120,6 @@ export default async function HomePage() {
         </div>
       </div>
 
-      <SummerProducts />
-
       {/* ===== FEATURED PRODUCTS ===== */}
       <section className="section">
         <div className="section-header">
@@ -143,6 +150,12 @@ export default async function HomePage() {
           )}
         </div>
       </section>
+
+      {/* ===== SEASONAL PRODUCTS (DYNAMIC) ===== */}
+      <SeasonalProducts 
+        winterProducts={winterProducts} 
+        summerProducts={summerProducts} 
+      />
 
       {/* ===== ABOUT STRIP ===== */}
       <div className="about-strip">

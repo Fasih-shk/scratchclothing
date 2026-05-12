@@ -16,7 +16,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
       alert('Please select a size');
       return;
     }
-    addToCart(product, selectedSize);
+    addToCart(product, selectedSize, product.images[selectedImage]?.url);
     setAdded(true);
     setTimeout(() => setAdded(false), 1200);
   };

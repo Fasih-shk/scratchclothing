@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import ProductCard from '@/components/ProductCard';
 
-export default function CollectionsClient({ initialProducts, initialCategories }) {
+export default function CollectionsClient({ initialProducts, initialCategories, title = "The Collection", subtitle = "Built for hustle. Worn with pride. Every piece tells a story — yours." }) {
   const [activeCategory, setActiveCategory] = useState('All');
   const [sortBy, setSortBy] = useState('default');
 
@@ -24,9 +24,9 @@ export default function CollectionsClient({ initialProducts, initialCategories }
     <div className="collections-page">
       <div className="collections-page__hero">
         <p className="section-eyebrow" style={{ marginBottom: '0.75rem' }}>All Products</p>
-        <h1 className="collections-page__title">The Collection</h1>
+        <h1 className="collections-page__title">{title}</h1>
         <p className="collections-page__sub">
-          Built for hustle. Worn with pride. Every piece tells a story — yours.
+          {subtitle}
         </p>
       </div>
 

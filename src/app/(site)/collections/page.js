@@ -12,7 +12,7 @@ export default async function CollectionsPage() {
   await connectDB();
 
   const [products, categories] = await Promise.all([
-    Product.find({ status: 'active' }).sort({ createdAt: -1 }).lean(),
+    Product.find({ status: 'active', session: { $exists: false } }).sort({ createdAt: -1 }).lean(),
     Category.find({ isActive: true }).sort({ displayOrder: 1 }).lean()
   ]);
 

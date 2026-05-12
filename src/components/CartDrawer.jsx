@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export default function CartDrawer() {
-  const { isCartOpen, setIsCartOpen, cartItems, cartTotal, removeFromCart, updateQuantity } = useCart();
+  const { isCartOpen, setIsCartOpen, cartItems, cartTotal, removeFromCart, updateQuantity, updateCustomText } = useCart();
   const [checkoutStep, setCheckoutStep] = useState('cart');
   const [selectedGateway, setSelectedGateway] = useState(null);
   const [billingDetails, setBillingDetails] = useState({
@@ -76,7 +76,13 @@ export default function CartDrawer() {
             cartItems.map((item) => (
               <div key={`${item.id}-${item.variant}`} style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '1.5rem' }}>
                 <div style={{ width: '80px', height: '100px', background: 'var(--color-surface-2)', borderRadius: 'var(--radius-sm)', overflow: 'hidden', position: 'relative' }}>
-                  <Image src={item.images[0]} alt={item.name} fill sizes="80px" style={{ objectFit: 'cover' }} />
+                  <Image 
+                    src={item.selectedImageUrl || item.images[0]?.url || '/placeholder.jpg'} 
+                    alt={item.images[0]?.alt || item.name} 
+                    fill 
+                    sizes="80px" 
+                    style={{ objectFit: 'cover' }} 
+                  />
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
@@ -84,7 +90,29 @@ export default function CartDrawer() {
                     <p style={{ fontSize: '0.75rem', color: 'var(--color-muted)', marginBottom: '0.5rem' }}>Size: {item.variant}</p>
                     <p style={{ fontSize: '0.9rem', fontWeight: 700 }}>{item.currency}{item.price.toFixed(2)}</p>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{ marginTop: '0.75rem' }}>
+                      <label style={{ fontSize: '0.65rem', color: 'var(--color-muted)', display: 'block', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        Custom Print
+                      </label>
+                      <input
+                        type="text"
+                        value={item.customText || ''}
+                        onChange={(e) => updateCustomText(item.id, item.variant, e.target.value)}
+                        placeholder="Type anything..."
+                        style={{
+                          width: '100%',
+                          background: 'var(--color-surface-2)',
+                          border: '1px solid var(--color-border)',
+                          color: 'var(--color-white)',
+                          borderRadius: '4px',
+                          padding: '4px 8px',
+                          fontSize: '0.75rem',
+                          outline: 'none'
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', border: '1px solid var(--color-border)', borderRadius: '4px' }}>
                       <button
                         onClick={() => updateQuantity(item.id, item.variant, item.quantity - 1)}
@@ -102,8 +130,7 @@ export default function CartDrawer() {
                     >Remove</button>
                   </div>
                 </div>
-              </div>
-            ))
+              ))
           ) : checkoutStep === 'payment' ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               <p style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>

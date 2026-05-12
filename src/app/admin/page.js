@@ -8,6 +8,7 @@ import {
   orderPipeline,
   recentOrders,
 } from '@/app/admin/data';
+import ThemeSelector from '@/components/ThemeSelector';
 
 function pillClass(status) {
   if (status === 'Completed' || status === 'Paid') return 'admin-pill admin-pill--success';
@@ -205,6 +206,8 @@ export default function AdminDashboard() {
           </div>
         </article>
       </section>
+
+      <ThemeSelector />
     </div>
   );
 }

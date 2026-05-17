@@ -9,7 +9,7 @@ const useCartStore = create(
       cartItems: [],
       isCartOpen: false,
       setIsCartOpen: (value) => set({ isCartOpen: value }),
-      addToCart: (product, variant, selectedImageUrl) => {
+      addToCart: (product, variant, selectedImageUrl, customText) => {
         set((state) => {
           const existing = state.cartItems.find(
             (item) => item.id === product.id && item.variant === variant
@@ -19,7 +19,12 @@ const useCartStore = create(
             return {
               cartItems: state.cartItems.map((item) =>
                 item.id === product.id && item.variant === variant
-                  ? { ...item, quantity: item.quantity + 1, selectedImageUrl: selectedImageUrl || item.selectedImageUrl }
+                  ? { 
+                      ...item, 
+                      quantity: item.quantity + 1, 
+                      selectedImageUrl: selectedImageUrl || item.selectedImageUrl,
+                      customText: customText || item.customText 
+                    }
                   : item
               ),
               isCartOpen: true,
@@ -27,7 +32,7 @@ const useCartStore = create(
           }
 
           return {
-            cartItems: [...state.cartItems, { ...product, variant, quantity: 1, selectedImageUrl }],
+            cartItems: [...state.cartItems, { ...product, variant, quantity: 1, selectedImageUrl, customText }],
             isCartOpen: true,
           };
         });

@@ -4,6 +4,8 @@ import { useCart } from '@/context/CartContext';
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import MyGooglePayButton from './GooglePayButton';
+import MyPayPalButton from './PayPalButton';
 
 export default function CartDrawer() {
   const { isCartOpen, setIsCartOpen, cartItems, cartTotal, removeFromCart, updateQuantity, updateCustomText } = useCart();
@@ -49,7 +51,7 @@ export default function CartDrawer() {
         style={{ opacity: 1, pointerEvents: 'all' }}
       />
 
-      <div className="mobile-drawer__panel" style={{ transform: 'translateX(0)', left: 'auto', right: 0, borderRight: 'none', borderLeft: '1px solid var(--color-border)' }}>
+      <div className="mobile-drawer__panel" style={{ width: '100%', maxWidth: '450px', transform: 'translateX(0)', left: 'auto', right: 0, borderRight: 'none', borderLeft: '1px solid var(--color-border)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
           <h2 style={{ fontFamily: 'var(--font-accent)', fontSize: '1.5rem', fontWeight: 700 }}>
             {checkoutStep === 'cart' && 'Your Cart'}
@@ -90,27 +92,11 @@ export default function CartDrawer() {
                     <p style={{ fontSize: '0.75rem', color: 'var(--color-muted)', marginBottom: '0.5rem' }}>Size: {item.variant}</p>
                     <p style={{ fontSize: '0.9rem', fontWeight: 700 }}>{item.currency}{item.price.toFixed(2)}</p>
                   </div>
-                    <div style={{ marginTop: '0.75rem' }}>
-                      <label style={{ fontSize: '0.65rem', color: 'var(--color-muted)', display: 'block', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        Custom Print
-                      </label>
-                      <input
-                        type="text"
-                        value={item.customText || ''}
-                        onChange={(e) => updateCustomText(item.id, item.variant, e.target.value)}
-                        placeholder="Type anything..."
-                        style={{
-                          width: '100%',
-                          background: 'var(--color-surface-2)',
-                          border: '1px solid var(--color-border)',
-                          color: 'var(--color-white)',
-                          borderRadius: '4px',
-                          padding: '4px 8px',
-                          fontSize: '0.75rem',
-                          outline: 'none'
-                        }}
-                      />
-                    </div>
+                    {item.customText && (
+                      <p style={{ fontSize: '0.7rem', color: 'var(--color-muted)', marginTop: '0.5rem', fontStyle: 'italic' }}>
+                        Custom Print: {item.customText}
+                      </p>
+                    )}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', border: '1px solid var(--color-border)', borderRadius: '4px' }}>
@@ -183,40 +169,40 @@ export default function CartDrawer() {
                 value={billingDetails.fullName}
                 onChange={(e) => handleBillingInput('fullName', e.target.value)}
                 placeholder="Full Name"
-                style={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
+                style={{ width: '100%', boxSizing: 'border-box', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
               />
               <input
                 type="email"
                 value={billingDetails.email}
                 onChange={(e) => handleBillingInput('email', e.target.value)}
                 placeholder="Email"
-                style={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
+                style={{ width: '100%', boxSizing: 'border-box', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
               />
               <input
                 value={billingDetails.address}
                 onChange={(e) => handleBillingInput('address', e.target.value)}
                 placeholder="Address"
-                style={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
+                style={{ width: '100%', boxSizing: 'border-box', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
               />
               <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: '1fr 1fr' }}>
                 <input
                   value={billingDetails.city}
                   onChange={(e) => handleBillingInput('city', e.target.value)}
                   placeholder="City"
-                  style={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
+                  style={{ width: '100%', boxSizing: 'border-box', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
                 />
                 <input
                   value={billingDetails.zipCode}
                   onChange={(e) => handleBillingInput('zipCode', e.target.value)}
                   placeholder="ZIP"
-                  style={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
+                  style={{ width: '100%', boxSizing: 'border-box', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
                 />
               </div>
               <input
                 value={billingDetails.country}
                 onChange={(e) => handleBillingInput('country', e.target.value)}
                 placeholder="Country"
-                style={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
+                style={{ width: '100%', boxSizing: 'border-box', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
               />
             </div>
           )}
@@ -239,12 +225,22 @@ export default function CartDrawer() {
               </button>
             )}
             {checkoutStep === 'billing' && (
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <button className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center', fontSize: '0.95rem' }} onClick={() => setCheckoutStep('payment')}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {selectedGateway === 'googlepay' ? (
+                  <div style={{ width: '100%', height: '48px' }}>
+                    <MyGooglePayButton totalPrice={cartTotal} />
+                  </div>
+                ) : selectedGateway === 'paypal' ? (
+                  <div style={{ width: '100%', zIndex: 1, position: 'relative' }}>
+                    <MyPayPalButton totalPrice={cartTotal} />
+                  </div>
+                ) : (
+                  <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', fontSize: '0.95rem' }}>
+                    Place Demo Order
+                  </button>
+                )}
+                <button className="btn btn-secondary" style={{ width: '100%', justifyContent: 'center', fontSize: '0.95rem' }} onClick={() => setCheckoutStep('payment')}>
                   Change Gateway
-                </button>
-                <button className="btn btn-primary" style={{ flex: 1, justifyContent: 'center', fontSize: '0.95rem' }}>
-                  Place Demo Order
                 </button>
               </div>
             )}

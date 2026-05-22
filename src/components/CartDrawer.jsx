@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import MyGooglePayButton from './GooglePayButton';
 import MyPayPalButton from './PayPalButton';
+import MyShopifyButton from './ShopifyButton';
 
 export default function CartDrawer() {
   const { isCartOpen, setIsCartOpen, cartItems, cartTotal, removeFromCart, updateQuantity, updateCustomText } = useCart();
@@ -161,57 +162,58 @@ export default function CartDrawer() {
               ))}
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <p style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>
-                Selected gateway: {paymentGateways.find((g) => g.id === selectedGateway)?.name || 'N/A'}
-              </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', padding: '0.5rem 0' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
+                <input
+                  className="billing-input"
+                  value={billingDetails.fullName}
+                  onChange={(e) => handleBillingInput('fullName', e.target.value)}
+                  placeholder="Full Name"
+                />
+                <input
+                  type="email"
+                  className="billing-input"
+                  value={billingDetails.email}
+                  onChange={(e) => handleBillingInput('email', e.target.value)}
+                  placeholder="Email"
+                />
+              </div>
+              
               <input
-                value={billingDetails.fullName}
-                onChange={(e) => handleBillingInput('fullName', e.target.value)}
-                placeholder="Full Name"
-                style={{ width: '100%', boxSizing: 'border-box', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
-              />
-              <input
-                type="email"
-                value={billingDetails.email}
-                onChange={(e) => handleBillingInput('email', e.target.value)}
-                placeholder="Email"
-                style={{ width: '100%', boxSizing: 'border-box', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
-              />
-              <input
+                className="billing-input"
                 value={billingDetails.address}
                 onChange={(e) => handleBillingInput('address', e.target.value)}
-                placeholder="Address"
-                style={{ width: '100%', boxSizing: 'border-box', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
+                placeholder="Street Address"
               />
-              <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: '1fr 1fr' }}>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr 1fr', gap: '0.6rem' }}>
                 <input
+                  className="billing-input"
                   value={billingDetails.city}
                   onChange={(e) => handleBillingInput('city', e.target.value)}
                   placeholder="City"
-                  style={{ width: '100%', boxSizing: 'border-box', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
                 />
                 <input
+                  className="billing-input"
                   value={billingDetails.zipCode}
                   onChange={(e) => handleBillingInput('zipCode', e.target.value)}
                   placeholder="ZIP"
-                  style={{ width: '100%', boxSizing: 'border-box', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
+                />
+                <input
+                  className="billing-input"
+                  value={billingDetails.country}
+                  onChange={(e) => handleBillingInput('country', e.target.value)}
+                  placeholder="Country"
                 />
               </div>
-              <input
-                value={billingDetails.country}
-                onChange={(e) => handleBillingInput('country', e.target.value)}
-                placeholder="Country"
-                style={{ width: '100%', boxSizing: 'border-box', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
-              />
             </div>
           )}
         </div>
 
         {cartItems.length > 0 && (
-          <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '2px solid var(--color-white)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-              <span style={{ fontSize: '1.1rem', fontWeight: 600 }}>Total</span>
+          <div style={{ marginTop: 'auto', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <span style={{ fontSize: '1rem', color: 'var(--color-muted)' }}>Total</span>
               <span style={{ fontSize: '1.1rem', fontWeight: 700 }}>GBP {cartTotal.toFixed(2)}</span>
             </div>
             {checkoutStep === 'cart' && (
@@ -233,6 +235,10 @@ export default function CartDrawer() {
                 ) : selectedGateway === 'paypal' ? (
                   <div style={{ width: '100%', zIndex: 1, position: 'relative' }}>
                     <MyPayPalButton totalPrice={cartTotal} />
+                  </div>
+                ) : selectedGateway === 'shopify' ? (
+                  <div style={{ width: '100%', zIndex: 1, position: 'relative' }}>
+                    <MyShopifyButton totalPrice={cartTotal} cartItems={cartItems} />
                   </div>
                 ) : (
                   <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', fontSize: '0.95rem' }}>

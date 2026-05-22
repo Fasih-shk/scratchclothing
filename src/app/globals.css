@@ -48,17 +48,17 @@
 }
 
 [data-theme="summer"] {
-  --color-black: #fffbeb;
-  --color-white: #451a03;
-  --color-accent: #f59e0b;
-  --color-muted: #92400e;
-  --color-border: rgba(245, 158, 11, 0.2);
-  --color-surface: rgba(255, 255, 255, 0.6);
-  --color-surface-2: rgba(255, 255, 255, 0.8);
+  --color-black: #5d2b63;
+  --color-white: #ffffff;
+  --color-accent: #ffb367;
+  --color-muted: rgba(255, 255, 255, 0.75);
+  --color-border: rgba(255, 255, 255, 0.25);
+  --color-surface: rgba(0, 0, 0, 0.35);
+  --color-surface-2: rgba(0, 0, 0, 0.55);
   --theme-bg-image: url('/themes/summer.png');
-  --theme-overlay: rgba(255, 251, 235, 0.2);
-  --theme-contrast: 1;
-  --theme-brightness: 1.1;
+  --theme-overlay: rgba(0, 0, 0, 0.2);
+  --theme-contrast: 1.05;
+  --theme-brightness: 0.95;
 }
 
 /* ===================== THEME DECORATIONS ===================== */
@@ -2512,4 +2512,27 @@ textarea.form-input {
   background: transparent;
   border: 1px solid var(--color-black);
   color: var(--color-black);
+}
+
+.billing-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
+  border-radius: 8px;
+  padding: 0.65rem 0.8rem;
+  font-size: 0.85rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.billing-input:focus {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
+}
+
+.billing-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
 }

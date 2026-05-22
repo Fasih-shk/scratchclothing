@@ -1,6 +1,7 @@
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import ProductDetailClient from './ProductDetailClient';
+import { notFound } from 'next/navigation';
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;

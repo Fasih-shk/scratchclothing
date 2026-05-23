@@ -193,10 +193,8 @@ const orderSchema = new mongoose.Schema(
 );
 
 // Indexes
-orderSchema.index({ orderNumber: 1 });
-orderSchema.index({ userId: 1 });
+// Note: orderNumber, userId, paymentStatus already indexed via index:true on field definitions
 orderSchema.index({ status: 1, createdAt: -1 });
-orderSchema.index({ paymentStatus: 1 });
 orderSchema.index({ createdAt: -1 });
 orderSchema.index({ email: 1 });
 

@@ -206,10 +206,8 @@ const productSchema = new mongoose.Schema(
 );
 
 // Indexes
+// Note: slug, category, collectionName already indexed via index:true on field definitions
 productSchema.index({ name: 'text', description: 'text' });
-productSchema.index({ slug: 1 });
-productSchema.index({ category: 1 });
-productSchema.index({ collectionName: 1 });
 productSchema.index({ status: 1, isFeatured: 1 });
 productSchema.index({ createdAt: -1 });
 

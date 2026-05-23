@@ -93,7 +93,7 @@ inventorySchema.virtual('calculatedAvailable').get(function () {
 inventorySchema.set('toJSON', { virtuals: true });
 
 // Indexes
-inventorySchema.index({ productId: 1 });
+// Note: productId already indexed via index:true on field definition
 inventorySchema.index({ isLowStock: 1 });
 inventorySchema.index({ isOutOfStock: 1 });
 

@@ -88,7 +88,7 @@ const reviewSchema = new mongoose.Schema(
 
 // Indexes
 reviewSchema.index({ productId: 1, status: 1 });
-reviewSchema.index({ userId: 1 });
+// Note: userId already indexed via index:true on field definition
 reviewSchema.index({ rating: 1 });
 reviewSchema.index({ createdAt: -1 });
 

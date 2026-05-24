@@ -13,10 +13,10 @@ export default function AboutPage() {
         <p className="section-eyebrow" style={{ marginBottom: '1rem' }}>Who We Are</p>
         <h1 className="about-page__hero-title">We all started from Zero.</h1>
         <p className="about-page__hero-body">
-          MUNI DRIP was built from nothing and became something — for the brothers and sisters
-          who came from the same. This is more than fashion. Every stitch, every drop, every
-          colourway carries the energy of those who refused to quit. We all started from zero.
-          Let&apos;s build together. Welcome to the family.
+          MUNI DRIP WAS BUILT FROM NOTHING AND BECAME SOMETHING — FOR THE BROTHERS AND SISTERS
+          WHO CAME FROM THE SAME. THIS IS MORE THAN FASHION. EVERY STITCH, EVERY DROP, EVERY
+          COLOURWAY CARRIES THE ENERGY OF THOSE WHO REFUSED TO QUIT. WE ALL STARTED FROM ZERO.
+          Let&apos;s BUILD TOGETHER. WELCOME TO THE FAMILY
         </p>
       </div>
 

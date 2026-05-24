@@ -1,21 +1,169 @@
-'use client';
-
-import {
-  activityFeed,
-  dashboardStats,
-  lowStockItems,
-  monthlySales,
-  orderPipeline,
-  recentOrders,
-} from '@/app/admin/data';
+import connectDB from '@/lib/mongodb';
+import Order from '@/models/Order';
+import Product from '@/models/Product';
+import User from '@/models/User';
+import ThemeSelector from '@/components/ThemeSelector';
 
 function pillClass(status) {
-  if (status === 'Completed' || status === 'Paid') return 'admin-pill admin-pill--success';
-  if (status === 'To Deliver' || status === 'To Bill' || status === 'Draft') return 'admin-pill admin-pill--warning';
+  if (status === 'completed' || status === 'paid' || status === 'Completed' || status === 'Paid') return 'admin-pill admin-pill--success';
+  if (status === 'To Deliver' || status === 'To Bill' || status === 'Draft' || status === 'pending' || status === 'processing' || status === 'shipped') return 'admin-pill admin-pill--warning';
   return 'admin-pill admin-pill--danger';
 }
 
-export default function AdminDashboard() {
+export default async function AdminDashboard() {
+  await connectDB();
+
+  // 1. Dashboard Stats
+  const orders = await Order.find();
+  const products = await Product.find();
+
+  let grossSales = 0;
+  let netSales = 0;
+  let openOrdersCount = 0;
+
+  orders.forEach((order) => {
+    grossSales += order.total || 0;
+    if (order.paymentStatus === 'completed' || order.paymentStatus === 'paid') {
+      netSales += order.total || 0;
+    }
+    if (order.status !== 'delivered' && order.status !== 'cancelled' && order.status !== 'returned') {
+      openOrdersCount++;
+    }
+  });
+
+  const lowStockThreshold = 10;
+  const lowStockCount = products.filter(p => (p.inventory?.available || 0) < (p.lowStockThreshold || lowStockThreshold)).length;
+
+  const dashboardStats = [
+    {
+      label: 'Gross Sales',
+      value: `GBP ${grossSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      trend: 'Calculated from total orders',
+      trendDirection: 'up',
+    },
+    {
+      label: 'Net Sales',
+      value: `GBP ${netSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      trend: 'Completed payments',
+      trendDirection: 'up',
+    },
+    {
+      label: 'Open Orders',
+      value: openOrdersCount.toString(),
+      trend: 'Pending fulfillment',
+      trendDirection: openOrdersCount > 0 ? 'up' : 'down',
+    },
+    {
+      label: 'Low Stock SKUs',
+      value: lowStockCount.toString(),
+      trend: 'Require reorder',
+      trendDirection: 'down',
+    },
+  ];
+
+  // 2. Monthly Sales (Aggregate)
+  const monthlySalesRaw = await Order.aggregate([
+    {
+      $group: {
+        _id: { $month: "$createdAt" },
+        amount: { $sum: "$total" }
+      }
+    },
+    { $sort: { "_id": 1 } }
+  ]);
+
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  
+  // Find max amount to calculate percentages
+  const maxMonthlySales = Math.max(...monthlySalesRaw.map(s => s.amount), 1); // fallback to 1 to avoid NaN
+
+  // If no monthly sales, provide a default empty chart or 0s. 
+  let monthlySales = monthlySalesRaw.map(item => ({
+    month: monthNames[item._id - 1],
+    amount: Math.round((item.amount / maxMonthlySales) * 100), // percentage for the bar
+    realAmount: item.amount
+  }));
+
+  // Ensure we show at least recent 6 months even if empty
+  if (monthlySales.length === 0) {
+    const currentMonthIndex = new Date().getMonth();
+    for (let i = 5; i >= 0; i--) {
+      let mIndex = (currentMonthIndex - i + 12) % 12;
+      monthlySales.push({
+        month: monthNames[mIndex],
+        amount: 0,
+        realAmount: 0
+      });
+    }
+  }
+
+  // 3. Order Pipeline
+  const pipelineRaw = await Order.aggregate([
+    {
+      $group: {
+        _id: "$status",
+        count: { $sum: 1 }
+      }
+    }
+  ]);
+  
+  const pipelineMap = pipelineRaw.reduce((acc, curr) => {
+    acc[curr._id] = curr.count;
+    return acc;
+  }, {});
+
+  const orderPipeline = [
+    { label: 'Pending', count: pipelineMap['pending'] || 0, type: 'warning' },
+    { label: 'Processing', count: pipelineMap['processing'] || 0, type: 'info' },
+    { label: 'Shipped', count: pipelineMap['shipped'] || 0, type: 'info' },
+    { label: 'Delivered', count: pipelineMap['delivered'] || 0, type: 'success' },
+    { label: 'Cancelled/Returned', count: (pipelineMap['cancelled'] || 0) + (pipelineMap['returned'] || 0), type: 'danger' },
+  ];
+
+  // 4. Recent Orders
+  const recentOrdersRaw = await Order.find()
+    .sort({ createdAt: -1 })
+    .limit(5)
+    .populate('userId');
+
+  const recentOrders = recentOrdersRaw.map(order => ({
+    id: order.orderNumber,
+    customer: order.userId ? `${order.userId.firstName} ${order.userId.lastName}` : (order.shippingAddress?.firstName ? `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}` : 'Guest'),
+    city: order.shippingAddress?.city || 'Unknown',
+    total: `${order.currency} ${order.total?.toFixed(2)}`,
+    status: order.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1) : 'Pending',
+    payment: order.paymentStatus ? order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1) : 'Pending'
+  }));
+
+  // 5. Low Stock Items
+  const lowStockItemsRaw = await Product.find({
+    $expr: {
+      $lt: [ { $ifNull: ["$inventory.available", 0] }, { $ifNull: ["$lowStockThreshold", 10] } ]
+    }
+  }).limit(5);
+
+  const lowStockItems = lowStockItemsRaw.map(product => ({
+    code: product.sku || product.slug,
+    itemName: product.name,
+    qty: product.inventory?.available || 0,
+    warehouse: 'Main Warehouse'
+  }));
+
+  // 6. Activity Feed (Mapping from recent orders)
+  const activityFeed = recentOrdersRaw.map(order => {
+    // Generate a human-readable time ago
+    const timeDiff = Date.now() - new Date(order.createdAt).getTime();
+    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+    const minutes = Math.floor(timeDiff / (1000 * 60));
+    const timeStr = hours > 24 ? `${Math.floor(hours/24)} days ago` : hours > 0 ? `${hours} hours ago` : `${minutes} mins ago`;
+
+    return {
+      action: `Order ${order.orderNumber} placed`,
+      user: order.email || 'customer',
+      time: timeStr
+    };
+  });
+
   return (
     <div>
       <div className="admin-page-header">
@@ -44,7 +192,7 @@ export default function AdminDashboard() {
       <div className="admin-card admin-welcome-card" style={{ marginBottom: '1.5rem' }}>
         <div className="admin-welcome-card__content">
           <h2 className="admin-welcome-card__title">Welcome back, Admin!</h2>
-          <p className="admin-welcome-card__text">You have 248 open orders to process today. Check your low stock alerts below.</p>
+          <p className="admin-welcome-card__text">You have {openOrdersCount} open orders to process today. Check your low stock alerts below.</p>
           <div className="admin-welcome-card__shortcuts">
             <button className="admin-welcome-card__shortcut">
               <svg viewBox="0 0 24 24" fill="none" width="16" height="16">
@@ -159,7 +307,7 @@ export default function AdminDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {recentOrders.map((order) => (
+                {recentOrders.length > 0 ? recentOrders.map((order) => (
                   <tr key={order.id}>
                     <td>{order.id}</td>
                     <td>{order.customer}</td>
@@ -168,7 +316,11 @@ export default function AdminDashboard() {
                     <td><span className={pillClass(order.status)}>{order.status}</span></td>
                     <td><span className={pillClass(order.payment)}>{order.payment}</span></td>
                   </tr>
-                ))}
+                )) : (
+                  <tr>
+                    <td colSpan="6" style={{ textAlign: 'center', padding: '1rem' }}>No recent orders found.</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -180,7 +332,7 @@ export default function AdminDashboard() {
             <button className="admin-btn admin-btn--ghost">Create Reorder</button>
           </div>
           <div className="admin-list" style={{ marginBottom: '0.9rem' }}>
-            {lowStockItems.map((item) => (
+            {lowStockItems.length > 0 ? lowStockItems.map((item) => (
               <div key={item.code} className="admin-list-item">
                 <div>
                   <p className="admin-list-item__title">{item.itemName}</p>
@@ -188,23 +340,29 @@ export default function AdminDashboard() {
                 </div>
                 <span className="admin-pill admin-pill--danger">Qty {item.qty}</span>
               </div>
-            ))}
+            )) : (
+              <p style={{ fontSize: '0.9rem', color: 'var(--color-muted)', padding: '0.5rem 0' }}>All stock levels are optimal.</p>
+            )}
           </div>
 
           <h4 className="admin-card__title" style={{ marginBottom: '0.6rem' }}>Recent Activity</h4>
           <div className="admin-list">
-            {activityFeed.map((activity) => (
-              <div key={activity.action} className="admin-list-item">
+            {activityFeed.length > 0 ? activityFeed.map((activity, index) => (
+              <div key={index} className="admin-list-item">
                 <div>
                   <p className="admin-list-item__title">{activity.action}</p>
                   <p className="admin-list-item__meta">{activity.user}</p>
                 </div>
                 <span className="admin-list-item__meta">{activity.time}</span>
               </div>
-            ))}
+            )) : (
+              <p style={{ fontSize: '0.9rem', color: 'var(--color-muted)', padding: '0.5rem 0' }}>No recent activity.</p>
+            )}
           </div>
         </article>
       </section>
+
+      <ThemeSelector />
     </div>
   );
 }

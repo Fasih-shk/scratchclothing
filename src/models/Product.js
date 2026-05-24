@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import './Category';
+import './Category.js';
 
 const productSchema = new mongoose.Schema(
   {
@@ -31,9 +31,14 @@ const productSchema = new mongoose.Schema(
       index: true,
     },
     tags: [String],
-    collection: {
+    collectionName: {
       type: String,
       enum: ['mens', 'womens', 'unisex', 'winter', 'summer'],
+      index: true,
+    },
+    session: {
+      type: String,
+      enum: ['winter', 'summer'],
       index: true,
     },
 
@@ -201,10 +206,8 @@ const productSchema = new mongoose.Schema(
 );
 
 // Indexes
+// Note: slug, category, collectionName already indexed via index:true on field definitions
 productSchema.index({ name: 'text', description: 'text' });
-productSchema.index({ slug: 1 });
-productSchema.index({ category: 1 });
-productSchema.index({ collection: 1 });
 productSchema.index({ status: 1, isFeatured: 1 });
 productSchema.index({ createdAt: -1 });
 

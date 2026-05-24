@@ -25,19 +25,8 @@ export async function POST(request) {
       );
     }
 
-    if (user.isVerified) {
-      return NextResponse.json({
-        success: true,
-        message: 'Account already verified',
-        user: {
-          _id: user._id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          isVerified: true,
-        },
-      });
-    }
+    // If the user provides an OTP, we verify it regardless of isVerified status
+    // to allow for login-time OTP verification.
 
     if (user.otpCode !== otp) {
       return NextResponse.json(

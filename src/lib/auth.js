@@ -37,6 +37,38 @@ export function generateResetToken() {
   return crypto.randomBytes(32).toString('hex');
 }
 
+export async function authenticateAdmin(request) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return { error: 'Authentication required', status: 401 };
+  }
+
+  const token = authHeader.replace('Bearer ', '');
+  const { valid, decoded, error } = verifyToken(token);
+  if (!valid) {
+    return { error: 'Invalid or expired token', status: 401 };
+  }
+
+  const { default: connectDB } = await import('@/lib/mongodb');
+  const { default: User } = await import('@/models/User');
+  await connectDB();
+
+  const user = await User.findById(decoded.userId);
+  if (!user) {
+    return { error: 'User not found', status: 404 };
+  }
+
+  if (!user.isActive) {
+    return { error: 'Account is disabled', status: 401 };
+  }
+
+  if (user.role !== 'admin') {
+    return { error: 'Admin access required', status: 403 };
+  }
+
+  return { user };
+}
+
 export function generateReferralCode() {
   return 'MD' + crypto.randomBytes(3).toString('hex').toUpperCase();
 }

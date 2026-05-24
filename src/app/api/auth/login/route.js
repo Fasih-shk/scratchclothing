@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
-import { comparePassword, generateToken } from '@/lib/auth';
+import { comparePassword, generateOTP } from '@/lib/auth';
+import { sendVerificationEmail } from '@/lib/email';
 
 export async function POST(request) {
   try {
@@ -41,26 +42,29 @@ export async function POST(request) {
       );
     }
 
-    const token = generateToken({
-      userId: user._id,
-      email: user.email,
-      role: user.role,
+    // Generate and send OTP for login verification
+    const otp = generateOTP();
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    await User.findByIdAndUpdate(user._id, {
+      otpCode: otp,
+      otpExpiry,
     });
 
-    const userResponse = {
-      _id: user._id,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      role: user.role,
-      isVerified: user.isVerified,
-    };
+    await sendVerificationEmail(user.email, otp);
 
     return NextResponse.json({
       success: true,
-      message: 'Login successful',
-      token,
-      user: userResponse,
+      requiresOTP: true,
+      message: 'OTP sent to your email',
+      user: {
+        _id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        isVerified: user.isVerified,
+      },
     });
   } catch (error) {
     console.error('Login error:', error);

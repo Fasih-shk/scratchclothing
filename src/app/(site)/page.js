@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import ProductCard from '@/components/ProductCard';
-import SummerProducts from '@/components/SummerProducts';
+import SeasonalProducts from '@/components/SeasonalProducts';
 // import { products } from '@/data/products'; // REMOVED MOCK DATA
 
 import connectDB from '@/lib/mongodb';
@@ -15,23 +15,46 @@ export const metadata = {
 
 const marqueeItems = [
   'NEW ARRIVALS', 'UAE to UK', 'PREMIUM STREETWEAR', 'FREE SHIPPING OVER £150',
-  'MUNI ISLAND COLLECTION', 'MADE FOR THE CULTURE', 'LIMITED DROPS',
+  'MUNIWXRLD COLLECTION', 'MADE FOR THE CULTURE', 'LIMITED DROPS',
 ];
 
 export default async function HomePage() {
-  await connectDB();
-  
-  // Fetch featured products
-  const featuredProducts = await Product.find({ isFeatured: true, status: 'active' })
-    .sort({ createdAt: -1 })
-    .limit(8)
-    .lean();
+  let featuredProducts = [];
+  let allProducts = [];
+  let winterProducts = [];
+  let summerProducts = [];
+  let errorMsg = null;
 
-  // Fetch recent products for full collection
-  const allProducts = await Product.find({ status: 'active' })
-    .sort({ createdAt: -1 })
-    .limit(16)
-    .lean();
+  try {
+    await connectDB();
+
+    // Fetch featured products
+    const featuredProductsRaw = await Product.find({ isFeatured: true, status: 'active', session: { $exists: false } })
+      .sort({ createdAt: -1 })
+      .limit(8)
+      .lean();
+
+    featuredProducts = JSON.parse(JSON.stringify(featuredProductsRaw));
+
+    // Fetch recent products for full collection
+    const allProductsRaw = await Product.find({ status: 'active', session: { $exists: false } })
+      .sort({ createdAt: -1 })
+      .limit(16)
+      .lean();
+
+    allProducts = JSON.parse(JSON.stringify(allProductsRaw));
+
+    // Fetch seasonal products
+    const winterProductsRaw = await Product.find({ status: 'active', session: 'winter' }).lean();
+    winterProducts = JSON.parse(JSON.stringify(winterProductsRaw));
+
+    const summerProductsRaw = await Product.find({ status: 'active', session: 'summer' }).lean();
+    summerProducts = JSON.parse(JSON.stringify(summerProductsRaw));
+  } catch (error) {
+    console.error('Database connection error:', error);
+    errorMsg = 'Unable to connect to the database. Please check your connection and IP whitelist.';
+  }
+
   return (
     <>
       {/* ===== HERO ===== */}
@@ -40,12 +63,12 @@ export default async function HomePage() {
         <div className="hero__noise" />
 
         <div className="hero__content">
-          <span className="hero__eyebrow">Premium Streetwear — UK</span>
+          {/* <span className="hero__eyebrow">Premium Streetwear — UK</span> */}
           <h1 className="hero__title">
-            BUILT DIFFERENT<br />MUNI DRIP.
+            BUILT FOR THE CULTURE
           </h1>
           <p className="hero__subtitle">
-            MORE MUNI MORE FREEDOM.
+            MORE MUNI MORE DRIP.
           </p>
           <div className="hero__cta-group">
             <Link href="/collections" className="btn btn-primary">
@@ -82,8 +105,8 @@ export default async function HomePage() {
         <div className="feature-strip__inner">
           {[
             { icon: '🚀', label: 'Fast Dispatch', desc: 'Orders shipped within 48hrs' },
-            { icon: '🌍', label: 'Worldwide Shipping', desc: 'We ship to 50+ countries' },
-            { icon: '♻️', label: 'Sustainable', desc: 'Ethically produced pieces' },
+            { icon: '🏪', label: 'Worldwide Shipping', desc: 'We ship to 50+ countries' },
+            { icon: '☔️', label: 'Sustainable', desc: 'Ethically produced pieces' },
             { icon: '🔒', label: 'Secure Checkout', desc: 'Payment with SSL encryption' },
           ].map(({ icon, label, desc }) => (
             <div key={label} className="feature-strip__item">
@@ -97,8 +120,6 @@ export default async function HomePage() {
         </div>
       </div>
 
-      <SummerProducts />
-
       {/* ===== FEATURED PRODUCTS ===== */}
       <section className="section">
         <div className="section-header">
@@ -111,18 +132,30 @@ export default async function HomePage() {
           </Link>
         </div>
 
+        {errorMsg && (
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#ff4d4d', background: 'rgba(255, 77, 77, 0.1)', borderRadius: '8px', margin: '2rem 0' }}>
+            {errorMsg}
+          </div>
+        )}
+
         <div className="product-grid">
           {featuredProducts.length > 0 ? (
             featuredProducts.map((product) => (
               <ProductCard key={product._id} product={product} />
             ))
-          ) : (
+          ) : !errorMsg && (
             <p className="admin-text-muted" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem' }}>
               No featured products found.
             </p>
           )}
         </div>
       </section>
+
+      {/* ===== SEASONAL PRODUCTS (DYNAMIC) ===== */}
+      <SeasonalProducts
+        winterProducts={winterProducts}
+        summerProducts={summerProducts}
+      />
 
       {/* ===== ABOUT STRIP ===== */}
       <div className="about-strip">
@@ -168,7 +201,7 @@ export default async function HomePage() {
             allProducts.map((product) => (
               <ProductCard key={product._id} product={product} />
             ))
-          ) : (
+          ) : !errorMsg && (
             <p className="admin-text-muted" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem' }}>
               Collection coming soon.
             </p>

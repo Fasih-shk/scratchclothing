@@ -9,7 +9,7 @@ const useCartStore = create(
       cartItems: [],
       isCartOpen: false,
       setIsCartOpen: (value) => set({ isCartOpen: value }),
-      addToCart: (product, variant) => {
+      addToCart: (product, variant, selectedImageUrl, customText) => {
         set((state) => {
           const existing = state.cartItems.find(
             (item) => item.id === product.id && item.variant === variant
@@ -19,7 +19,12 @@ const useCartStore = create(
             return {
               cartItems: state.cartItems.map((item) =>
                 item.id === product.id && item.variant === variant
-                  ? { ...item, quantity: item.quantity + 1 }
+                  ? { 
+                      ...item, 
+                      quantity: item.quantity + 1, 
+                      selectedImageUrl: selectedImageUrl || item.selectedImageUrl,
+                      customText: customText || item.customText 
+                    }
                   : item
               ),
               isCartOpen: true,
@@ -27,7 +32,7 @@ const useCartStore = create(
           }
 
           return {
-            cartItems: [...state.cartItems, { ...product, variant, quantity: 1 }],
+            cartItems: [...state.cartItems, { ...product, variant, quantity: 1, selectedImageUrl, customText }],
             isCartOpen: true,
           };
         });
@@ -50,6 +55,13 @@ const useCartStore = create(
           ),
         }));
       },
+      updateCustomText: (id, variant, text) => {
+        set((state) => ({
+          cartItems: state.cartItems.map((item) =>
+            item.id === id && item.variant === variant ? { ...item, customText: text } : item
+          ),
+        }));
+      },
     }),
     {
       name: 'munidrip_cart',
@@ -66,6 +78,7 @@ export function useCart() {
     addToCart,
     removeFromCart,
     updateQuantity,
+    updateCustomText,
   } = useCartStore();
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -80,5 +93,6 @@ export function useCart() {
     addToCart,
     removeFromCart,
     updateQuantity,
+    updateCustomText,
   };
 }

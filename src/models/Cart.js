@@ -94,7 +94,7 @@ const cartSchema = new mongoose.Schema(
 );
 
 // Indexes
-cartSchema.index({ userId: 1 });
+// Note: userId already indexed via index:true on field definition
 cartSchema.index({ status: 1, updatedAt: -1 });
 
 // Auto-update cart status to abandoned after 24 hours of inactivity

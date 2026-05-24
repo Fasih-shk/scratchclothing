@@ -4,9 +4,12 @@ import { useCart } from '@/context/CartContext';
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import MyGooglePayButton from './GooglePayButton';
+import MyPayPalButton from './PayPalButton';
+import MyShopifyButton from './ShopifyButton';
 
 export default function CartDrawer() {
-  const { isCartOpen, setIsCartOpen, cartItems, cartTotal, removeFromCart, updateQuantity } = useCart();
+  const { isCartOpen, setIsCartOpen, cartItems, cartTotal, removeFromCart, updateQuantity, updateCustomText } = useCart();
   const [checkoutStep, setCheckoutStep] = useState('cart');
   const [selectedGateway, setSelectedGateway] = useState(null);
   const [billingDetails, setBillingDetails] = useState({
@@ -49,7 +52,7 @@ export default function CartDrawer() {
         style={{ opacity: 1, pointerEvents: 'all' }}
       />
 
-      <div className="mobile-drawer__panel" style={{ transform: 'translateX(0)', left: 'auto', right: 0, borderRight: 'none', borderLeft: '1px solid var(--color-border)' }}>
+      <div className="mobile-drawer__panel" style={{ width: '100%', maxWidth: '450px', transform: 'translateX(0)', left: 'auto', right: 0, borderRight: 'none', borderLeft: '1px solid var(--color-border)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
           <h2 style={{ fontFamily: 'var(--font-accent)', fontSize: '1.5rem', fontWeight: 700 }}>
             {checkoutStep === 'cart' && 'Your Cart'}
@@ -76,7 +79,13 @@ export default function CartDrawer() {
             cartItems.map((item) => (
               <div key={`${item.id}-${item.variant}`} style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '1.5rem' }}>
                 <div style={{ width: '80px', height: '100px', background: 'var(--color-surface-2)', borderRadius: 'var(--radius-sm)', overflow: 'hidden', position: 'relative' }}>
-                  <Image src={item.images[0]} alt={item.name} fill sizes="80px" style={{ objectFit: 'cover' }} />
+                  <Image 
+                    src={item.selectedImageUrl || item.images[0]?.url || '/placeholder.jpg'} 
+                    alt={item.images[0]?.alt || item.name} 
+                    fill 
+                    sizes="80px" 
+                    style={{ objectFit: 'cover' }} 
+                  />
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
@@ -84,7 +93,13 @@ export default function CartDrawer() {
                     <p style={{ fontSize: '0.75rem', color: 'var(--color-muted)', marginBottom: '0.5rem' }}>Size: {item.variant}</p>
                     <p style={{ fontSize: '0.9rem', fontWeight: 700 }}>{item.currency}{item.price.toFixed(2)}</p>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    {item.customText && (
+                      <p style={{ fontSize: '0.7rem', color: 'var(--color-muted)', marginTop: '0.5rem', fontStyle: 'italic' }}>
+                        Custom Print: {item.customText}
+                      </p>
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', border: '1px solid var(--color-border)', borderRadius: '4px' }}>
                       <button
                         onClick={() => updateQuantity(item.id, item.variant, item.quantity - 1)}
@@ -102,8 +117,7 @@ export default function CartDrawer() {
                     >Remove</button>
                   </div>
                 </div>
-              </div>
-            ))
+              ))
           ) : checkoutStep === 'payment' ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               <p style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>
@@ -148,57 +162,58 @@ export default function CartDrawer() {
               ))}
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <p style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>
-                Selected gateway: {paymentGateways.find((g) => g.id === selectedGateway)?.name || 'N/A'}
-              </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', padding: '0.5rem 0' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
+                <input
+                  className="billing-input"
+                  value={billingDetails.fullName}
+                  onChange={(e) => handleBillingInput('fullName', e.target.value)}
+                  placeholder="Full Name"
+                />
+                <input
+                  type="email"
+                  className="billing-input"
+                  value={billingDetails.email}
+                  onChange={(e) => handleBillingInput('email', e.target.value)}
+                  placeholder="Email"
+                />
+              </div>
+              
               <input
-                value={billingDetails.fullName}
-                onChange={(e) => handleBillingInput('fullName', e.target.value)}
-                placeholder="Full Name"
-                style={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
-              />
-              <input
-                type="email"
-                value={billingDetails.email}
-                onChange={(e) => handleBillingInput('email', e.target.value)}
-                placeholder="Email"
-                style={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
-              />
-              <input
+                className="billing-input"
                 value={billingDetails.address}
                 onChange={(e) => handleBillingInput('address', e.target.value)}
-                placeholder="Address"
-                style={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
+                placeholder="Street Address"
               />
-              <div style={{ display: 'grid', gap: '0.75rem', gridTemplateColumns: '1fr 1fr' }}>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr 1fr', gap: '0.6rem' }}>
                 <input
+                  className="billing-input"
                   value={billingDetails.city}
                   onChange={(e) => handleBillingInput('city', e.target.value)}
                   placeholder="City"
-                  style={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
                 />
                 <input
+                  className="billing-input"
                   value={billingDetails.zipCode}
                   onChange={(e) => handleBillingInput('zipCode', e.target.value)}
                   placeholder="ZIP"
-                  style={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
+                />
+                <input
+                  className="billing-input"
+                  value={billingDetails.country}
+                  onChange={(e) => handleBillingInput('country', e.target.value)}
+                  placeholder="Country"
                 />
               </div>
-              <input
-                value={billingDetails.country}
-                onChange={(e) => handleBillingInput('country', e.target.value)}
-                placeholder="Country"
-                style={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-white)', borderRadius: '8px', padding: '0.75rem' }}
-              />
             </div>
           )}
         </div>
 
         {cartItems.length > 0 && (
-          <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '2px solid var(--color-white)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-              <span style={{ fontSize: '1.1rem', fontWeight: 600 }}>Total</span>
+          <div style={{ marginTop: 'auto', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <span style={{ fontSize: '1rem', color: 'var(--color-muted)' }}>Total</span>
               <span style={{ fontSize: '1.1rem', fontWeight: 700 }}>GBP {cartTotal.toFixed(2)}</span>
             </div>
             {checkoutStep === 'cart' && (
@@ -212,12 +227,26 @@ export default function CartDrawer() {
               </button>
             )}
             {checkoutStep === 'billing' && (
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <button className="btn btn-secondary" style={{ flex: 1, justifyContent: 'center', fontSize: '0.95rem' }} onClick={() => setCheckoutStep('payment')}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {selectedGateway === 'googlepay' ? (
+                  <div style={{ width: '100%', height: '48px' }}>
+                    <MyGooglePayButton totalPrice={cartTotal} />
+                  </div>
+                ) : selectedGateway === 'paypal' ? (
+                  <div style={{ width: '100%', zIndex: 1, position: 'relative' }}>
+                    <MyPayPalButton totalPrice={cartTotal} />
+                  </div>
+                ) : selectedGateway === 'shopify' ? (
+                  <div style={{ width: '100%', zIndex: 1, position: 'relative' }}>
+                    <MyShopifyButton totalPrice={cartTotal} cartItems={cartItems} />
+                  </div>
+                ) : (
+                  <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', fontSize: '0.95rem' }}>
+                    Place Demo Order
+                  </button>
+                )}
+                <button className="btn btn-secondary" style={{ width: '100%', justifyContent: 'center', fontSize: '0.95rem' }} onClick={() => setCheckoutStep('payment')}>
                   Change Gateway
-                </button>
-                <button className="btn btn-primary" style={{ flex: 1, justifyContent: 'center', fontSize: '0.95rem' }}>
-                  Place Demo Order
                 </button>
               </div>
             )}

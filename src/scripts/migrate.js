@@ -105,7 +105,7 @@ async function seedSampleData() {
         status: 'active',
         isFeatured: true,
         isNewArrival: true,
-        collection: 'mens',
+        collectionName: 'mens',
         inventory: {
           total: 100,
           available: 100,
@@ -134,7 +134,7 @@ async function seedSampleData() {
         sku: 'HOODIE-001',
         status: 'active',
         isFeatured: true,
-        collection: 'unisex',
+        collectionName: 'unisex',
         inventory: {
           total: 50,
           available: 50,

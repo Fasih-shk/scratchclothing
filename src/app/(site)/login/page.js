@@ -27,6 +27,11 @@ export default function LoginPage() {
       setError('');
       const result = await login(data.email, data.password);
       
+      if (result?.requiresOTP) {
+        router.push('/verify-otp');
+        return;
+      }
+      
       if (result?.user?.role === 'admin') {
         router.push('/admin');
       } else {

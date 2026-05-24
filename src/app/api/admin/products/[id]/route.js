@@ -2,10 +2,15 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import Category from '@/models/Category';
+import { authenticateAdmin } from '@/lib/auth';
 
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const auth = await authenticateAdmin(request);
+    if (auth.error) {
+      return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+    }
+    const { id } = await params;
     await connectDB();
 
     const product = await Product.findById(id).populate('category', 'name slug').lean();
@@ -32,7 +37,12 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
   try {
-    const { id } = params;
+    const auth = await authenticateAdmin(request);
+    if (auth.error) {
+      return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+    }
+
+    const { id } = await params;
     const body = await request.json();
     
     await connectDB();
@@ -71,7 +81,7 @@ export async function PUT(request, { params }) {
     const updateFields = [
       'name', 'slug', 'description', 'shortDescription', 'category',
       'price', 'originalPrice', 'discount', 'discountType', 'currency',
-      'images', 'sku', 'status', 'isFeatured', 'isNewArrival', 'collection',
+      'images', 'sku', 'status', 'isFeatured', 'isNewArrival', 'collection', 'session',
       'tags', 'material', 'brand', 'lowStockThreshold', 'trackInventory',
       'seoTitle', 'seoDescription', 'seoKeywords', 'requiresShipping', 'inventory'
     ];
@@ -107,7 +117,12 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const { id } = params;
+    const auth = await authenticateAdmin(request);
+    if (auth.error) {
+      return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+    }
+
+    const { id } = await params;
     await connectDB();
 
     const product = await Product.findById(id);

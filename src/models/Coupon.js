@@ -109,7 +109,7 @@ const couponSchema = new mongoose.Schema(
 );
 
 // Indexes
-couponSchema.index({ code: 1 });
+// Note: code already indexed via index:true on field definition
 couponSchema.index({ isActive: 1, endDate: 1 });
 couponSchema.index({ startDate: 1, endDate: 1 });
 

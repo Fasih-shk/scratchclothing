@@ -228,6 +228,7 @@ export default function AdminProducts() {
                   <th>Name</th>
                   <th>SKU</th>
                   <th>Category</th>
+                  <th>Session</th>
                   <th>Price</th>
                   <th>Stock</th>
                   <th>Status</th>
@@ -260,6 +261,7 @@ export default function AdminProducts() {
                       <td style={{ fontWeight: 500 }}>{product.name}</td>
                       <td style={{ fontSize: 12 }}>{product.sku || '-'}</td>
                       <td>{product.category?.name || '-'}</td>
+                      <td style={{ textTransform: 'capitalize' }}>{product.session || '-'}</td>
                       <td>
                         {product.currency} {product.price.toFixed(2)}
                         {product.discount > 0 && (
@@ -385,6 +387,7 @@ function ProductModal({ product, categories, onSave, onClose }) {
     isFeatured: product?.isFeatured || false,
     isNewArrival: product?.isNewArrival || false,
     collection: product?.collection || '',
+    session: product?.session || '',
     tags: product?.tags?.join(', ') || '',
     material: product?.material || '',
     brand: product?.brand || '',
@@ -702,6 +705,19 @@ function ProductModal({ product, categories, onSave, onClose }) {
                 <option value="mens">Mens</option>
                 <option value="womens">Womens</option>
                 <option value="unisex">Unisex</option>
+                <option value="winter">Winter</option>
+                <option value="summer">Summer</option>
+              </select>
+            </div>
+            <div className="admin-form-group">
+              <label>Session</label>
+              <select
+                className="admin-select"
+                name="session"
+                value={formData.session}
+                onChange={handleChange}
+              >
+                <option value="">Select Session</option>
                 <option value="winter">Winter</option>
                 <option value="summer">Summer</option>
               </select>

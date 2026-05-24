@@ -8,6 +8,8 @@ import { useCart } from '@/context/CartContext';
 export default function ProductDetailClient({ product, relatedProducts }) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState(null);
+  const [hasCustomPrint, setHasCustomPrint] = useState(false);
+  const [customText, setCustomText] = useState('');
   const [added, setAdded] = useState(false);
   const { addToCart } = useCart();
 
@@ -16,7 +18,7 @@ export default function ProductDetailClient({ product, relatedProducts }) {
       alert('Please select a size');
       return;
     }
-    addToCart(product, selectedSize);
+    addToCart(product, selectedSize, product.images[selectedImage]?.url, hasCustomPrint ? customText : '');
     setAdded(true);
     setTimeout(() => setAdded(false), 1200);
   };
@@ -134,6 +136,69 @@ export default function ProductDetailClient({ product, relatedProducts }) {
                   {size}
                 </button>
               ))
+            )}
+          </div>
+
+          {/* Custom Print */}
+          <div style={{ marginBottom: '2rem' }}>
+            <label style={{ 
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              cursor: 'pointer',
+              fontSize: '0.85rem', 
+              fontWeight: 600, 
+              color: 'var(--color-white)',
+              marginBottom: hasCustomPrint ? '1rem' : '0'
+            }}>
+              <input 
+                type="checkbox" 
+                checked={hasCustomPrint} 
+                onChange={(e) => setHasCustomPrint(e.target.checked)}
+                style={{ 
+                  width: '18px', 
+                  height: '18px', 
+                  accentColor: 'var(--color-white)',
+                  cursor: 'pointer'
+                }}
+              />
+              Add Custom Print?
+            </label>
+
+            {hasCustomPrint && (
+              <div style={{ marginTop: '1rem', animation: 'fadeIn 0.3s ease' }}>
+                <label style={{ 
+                  display: 'block', 
+                  fontSize: '0.8rem', 
+                  fontWeight: 600, 
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  marginBottom: '0.75rem',
+                  color: 'var(--color-muted)'
+                }}>
+                  Custom Print Text
+                </label>
+                <textarea
+                  value={customText}
+                  onChange={(e) => setCustomText(e.target.value)}
+                  placeholder="Enter text to print on your item..."
+                  rows={3}
+                  className="form-input"
+                  style={{
+                    background: 'var(--color-surface)',
+                    border: '1px solid var(--color-border)',
+                    color: 'var(--color-white)',
+                    borderRadius: 'var(--radius-sm)',
+                    padding: '1rem',
+                    fontSize: '0.95rem',
+                    width: '100%',
+                    outline: 'none',
+                    resize: 'none',
+                    lineHeight: '1.5',
+                    transition: 'border-color var(--transition)'
+                  }}
+                />
+              </div>
             )}
           </div>
 

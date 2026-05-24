@@ -179,9 +179,7 @@ returnSchema.pre('save', async function (next) {
 });
 
 // Indexes
-returnSchema.index({ returnNumber: 1 });
-returnSchema.index({ orderId: 1 });
-returnSchema.index({ userId: 1 });
+// Note: returnNumber, orderId, userId already indexed via index:true on field definitions
 returnSchema.index({ status: 1, createdAt: -1 });
 
 export default mongoose.models.Return || mongoose.model('Return', returnSchema);

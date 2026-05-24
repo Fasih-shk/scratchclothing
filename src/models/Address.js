@@ -53,6 +53,6 @@ const addressSchema = new mongoose.Schema(
   }
 );
 
-addressSchema.index({ userId: 1 });
+// Note: userId already indexed via index:true on field definition
 
 export default mongoose.models.Address || mongoose.model('Address', addressSchema);

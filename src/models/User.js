@@ -113,9 +113,7 @@ const userSchema = new mongoose.Schema(
 );
 
 // Indexes
-userSchema.index({ email: 1 });
-userSchema.index({ createdAt: -1 });
-
+// Note: email already indexed via index:true on field definition
 userSchema.index({ createdAt: -1 });
 
 export default mongoose.models.User || mongoose.model('User', userSchema);

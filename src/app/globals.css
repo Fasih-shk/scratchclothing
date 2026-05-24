@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700&family=Inter:wght@400;500;600;700&display=swap');
+
 /* ===================== RESET & BASE ===================== */
 *,
 *::before,
@@ -16,8 +18,11 @@
   --color-surface: #111111;
   --color-surface-2: #1a1a1a;
 
-  --font-body: var(--font-inter), sans-serif;
-  --font-accent: var(--font-bricolage), sans-serif;
+  --font-inter: 'Inter', sans-serif;
+  --font-bricolage: 'Bricolage Grotesque', sans-serif;
+
+  --font-body: var(--font-inter);
+  --font-accent: var(--font-bricolage);
 
   --radius-sm: 4px;
   --radius-md: 12px;

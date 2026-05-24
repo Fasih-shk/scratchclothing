@@ -7,6 +7,8 @@ import SeasonalProducts from '@/components/SeasonalProducts';
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Scratch® | Started from Scratch, Worn by Hustlers',
   description:

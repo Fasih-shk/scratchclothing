@@ -2,9 +2,14 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 import Category from '@/models/Category';
+import { authenticateAdmin } from '@/lib/auth';
 
 export async function GET(request) {
   try {
+    const auth = await authenticateAdmin(request);
+    if (auth.error) {
+      return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+    }
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page')) || 1;
     const limit = parseInt(searchParams.get('limit')) || 10;
@@ -82,6 +87,11 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const auth = await authenticateAdmin(request);
+    if (auth.error) {
+      return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+    }
+
     const body = await request.json();
     const { name, slug, description, category, price, originalPrice, discount, discountType, currency, images, sku, status, isFeatured, isNewArrival, collection, session, inventory, tags, shortDescription, material, brand, lowStockThreshold, trackInventory, seoTitle, seoDescription, seoKeywords, requiresShipping } = body;
 

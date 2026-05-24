@@ -20,6 +20,16 @@ export default function AdminLayout({ children }) {
   }, [isInitialized, initialize]);
 
   useEffect(() => {
+    if (isInitialized) {
+      if (!user) {
+        router.push('/login');
+      } else if (user.role !== 'admin') {
+        router.push('/');
+      }
+    }
+  }, [isInitialized, user, router]);
+
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
@@ -28,6 +38,16 @@ export default function AdminLayout({ children }) {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  if (!isInitialized || !user || user.role !== 'admin') {
+    return (
+      <div className="admin-layout">
+        <div className="admin-shell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleLogout = async () => {
     await logout();

@@ -15,7 +15,7 @@ export const metadata = {
 
 const marqueeItems = [
   'NEW ARRIVALS', 'UAE to UK', 'PREMIUM STREETWEAR', 'FREE SHIPPING OVER £150',
-  'MUNI ISLAND COLLECTION', 'MADE FOR THE CULTURE', 'LIMITED DROPS',
+  'MUNIWXRLD COLLECTION', 'MADE FOR THE CULTURE', 'LIMITED DROPS',
 ];
 
 export default async function HomePage() {
@@ -27,13 +27,13 @@ export default async function HomePage() {
 
   try {
     await connectDB();
-    
+
     // Fetch featured products
     const featuredProductsRaw = await Product.find({ isFeatured: true, status: 'active', session: { $exists: false } })
       .sort({ createdAt: -1 })
       .limit(8)
       .lean();
-    
+
     featuredProducts = JSON.parse(JSON.stringify(featuredProductsRaw));
 
     // Fetch recent products for full collection
@@ -63,12 +63,12 @@ export default async function HomePage() {
         <div className="hero__noise" />
 
         <div className="hero__content">
-          <span className="hero__eyebrow">Premium Streetwear — UK</span>
+          {/* <span className="hero__eyebrow">Premium Streetwear — UK</span> */}
           <h1 className="hero__title">
-            BUILT DIFFERENT<br />MUNI DRIP.
+            BUILT FOR THE CULTURE
           </h1>
           <p className="hero__subtitle">
-            MORE MUNI MORE FREEDOM.
+            MORE MUNI MORE DRIP.
           </p>
           <div className="hero__cta-group">
             <Link href="/collections" className="btn btn-primary">
@@ -105,8 +105,8 @@ export default async function HomePage() {
         <div className="feature-strip__inner">
           {[
             { icon: '🚀', label: 'Fast Dispatch', desc: 'Orders shipped within 48hrs' },
-            { icon: '🌍', label: 'Worldwide Shipping', desc: 'We ship to 50+ countries' },
-            { icon: '♻️', label: 'Sustainable', desc: 'Ethically produced pieces' },
+            { icon: '🏪', label: 'Worldwide Shipping', desc: 'We ship to 50+ countries' },
+            { icon: '☔️', label: 'Sustainable', desc: 'Ethically produced pieces' },
             { icon: '🔒', label: 'Secure Checkout', desc: 'Payment with SSL encryption' },
           ].map(({ icon, label, desc }) => (
             <div key={label} className="feature-strip__item">
@@ -152,9 +152,9 @@ export default async function HomePage() {
       </section>
 
       {/* ===== SEASONAL PRODUCTS (DYNAMIC) ===== */}
-      <SeasonalProducts 
-        winterProducts={winterProducts} 
-        summerProducts={summerProducts} 
+      <SeasonalProducts
+        winterProducts={winterProducts}
+        summerProducts={summerProducts}
       />
 
       {/* ===== ABOUT STRIP ===== */}

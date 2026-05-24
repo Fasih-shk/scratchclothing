@@ -10,7 +10,7 @@ export default function Footer() {
           <div className="footer__brand">
             <h2 className="footer__logo">MUNI DRIP®</h2>
             <p className="footer__tagline">
-              MUNI DRIP.<br />Worn by Hustlers.
+              MORE MUNI MORE DRIP.<br />Worn by Hustlers.
             </p>
           </div>
 
@@ -41,7 +41,7 @@ export default function Footer() {
 
         <div className="footer__bottom">
           <p className="footer__copy">
-            &copy; {year} Scratch Clothing. All rights reserved.
+            &copy; {year} MUNI DRIP. All rights reserved.
           </p>
           <div className="footer__payment-icons">
             <span className="payment-icon">VISA</span>

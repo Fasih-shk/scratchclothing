@@ -1,0 +1,62 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - fasih_Branch
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create .env.local
+        run: |
+          set -e
+          printf 'MONGODB_URI=%s\n' "${{ secrets.MONGODB_URI }}" > .env.local
+          printf 'JWT_SECRET=%s\n' "${{ secrets.JWT_SECRET }}" >> .env.local
+          printf 'JWT_EXPIRES_IN=%s\n' "${{ secrets.JWT_EXPIRES_IN }}" >> .env.local
+          printf 'NEXT_PUBLIC_SITE_URL=%s\n' "${{ secrets.NEXT_PUBLIC_SITE_URL }}" >> .env.local
+          printf 'EMAIL_SERVER_HOST=%s\n' "${{ secrets.EMAIL_SERVER_HOST }}" >> .env.local
+          printf 'EMAIL_SERVER_PORT=%s\n' "${{ secrets.EMAIL_SERVER_PORT }}" >> .env.local
+          printf 'EMAIL_USER=%s\n' "${{ secrets.EMAIL_USER }}" >> .env.local
+          printf 'EMAIL_PASSWORD=%s\n' "${{ secrets.EMAIL_PASSWORD }}" >> .env.local
+          printf 'EMAIL_FROM_NAME=%s\n' "${{ secrets.EMAIL_FROM_NAME }}" >> .env.local
+          printf 'EMAIL_FROM_EMAIL=%s\n' "${{ secrets.EMAIL_FROM_EMAIL }}" >> .env.local
+          printf 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=%s\n' "${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}" >> .env.local
+          printf 'STRIPE_SECRET_KEY=%s\n' "${{ secrets.STRIPE_SECRET_KEY }}" >> .env.local
+          printf 'NEXT_PUBLIC_PAYPAL_CLIENT_ID=%s\n' "${{ secrets.NEXT_PUBLIC_PAYPAL_CLIENT_ID }}" >> .env.local
+          printf 'NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN=%s\n' "${{ secrets.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN }}" >> .env.local
+          printf 'NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN=%s\n' "${{ secrets.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN }}" >> .env.local
+          printf 'SHOPIFY_ADMIN_API_KEY=%s\n' "${{ secrets.SHOPIFY_ADMIN_API_KEY }}" >> .env.local
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+          EMAIL_SERVER_HOST: ${{ secrets.EMAIL_SERVER_HOST }}
+          EMAIL_SERVER_PORT: ${{ secrets.EMAIL_SERVER_PORT }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_FROM_NAME: ${{ secrets.EMAIL_FROM_NAME }}
+          EMAIL_FROM_EMAIL: ${{ secrets.EMAIL_FROM_EMAIL }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          NEXT_PUBLIC_PAYPAL_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_PAYPAL_CLIENT_ID }}
+          NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN: ${{ secrets.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN }}
+          NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN: ${{ secrets.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN }}
+          SHOPIFY_ADMIN_API_KEY: ${{ secrets.SHOPIFY_ADMIN_API_KEY }}
+        run: npm run build
+
+      - name: Restart PM2
+        run: |
+          pm2 restart scratchclothing || pm2 start npm --name "scratchclothing" -- start
+          pm2 save

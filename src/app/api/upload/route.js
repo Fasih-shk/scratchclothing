@@ -12,7 +12,7 @@ export async function POST(request) {
     }
 
     // Use UPLOAD_DIR env variable if set, otherwise fallback to local public/uploads for development
-    const uploadDir = process.env.UPLOAD_DIR || path.join(process.cwd(), 'public', 'uploads');
+    const uploadDir = process.env.UPLOAD_DIR || path.join(/*turbopackIgnore: true*/ process.cwd(), 'public', 'uploads');
     
     // Ensure upload directory exists
     try {

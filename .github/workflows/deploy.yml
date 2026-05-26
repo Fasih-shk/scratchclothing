@@ -18,15 +18,14 @@ jobs:
           # Create persistent uploads directory outside checkout
           mkdir -p ../uploads
           
-          # If public/uploads exists, is a directory, and is NOT a symlink
-          if [ -d public/uploads ] && [ ! -L public/uploads ]; then
-            echo "Moving existing uploads to persistent directory..."
-            cp -r public/uploads/* ../uploads/ 2>/dev/null || true
+          # If public/uploads exists, move any files to persistent folder and remove it so it doesn't interfere with the Next.js build
+          if [ -d public/uploads ] || [ -L public/uploads ]; then
+            echo "Backing up public/uploads files..."
+            if [ -d public/uploads ] && [ ! -L public/uploads ]; then
+              cp -r public/uploads/* ../uploads/ 2>/dev/null || true
+            fi
             rm -rf public/uploads
           fi
-          
-          # Create symlink
-          ln -sfn ../../uploads public/uploads
 
       - name: Create .env.local
         run: |
@@ -75,6 +74,10 @@ jobs:
         run: |
           echo "=== PM2 STATUS BEFORE ==="
           pm2 status
+          
+          # Recreate symlink to persistent uploads directory for runtime
+          ln -sfn ../../uploads public/uploads
+          
           echo "=== DELETING OLD PM2 PROCESS ==="
           pm2 delete scratchclothing || true
           echo "=== STARTING NEW PM2 PROCESS FROM WORKSPACE ==="

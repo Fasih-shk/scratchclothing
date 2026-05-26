@@ -26,6 +26,9 @@ jobs:
             fi
             rm -rf public/uploads
           fi
+          
+          # Create symlink BEFORE build so Next.js recognizes the directory in production
+          ln -sfn /var/www/scratchclothing.co.uk/uploads public/uploads
 
       - name: Create .env.local
         run: |
@@ -75,9 +78,6 @@ jobs:
         run: |
           echo "=== PM2 STATUS BEFORE ==="
           pm2 status
-          
-          # Recreate symlink to persistent uploads directory for runtime
-          ln -sfn /var/www/scratchclothing.co.uk/uploads public/uploads
           
           echo "=== DELETING OLD PM2 PROCESS ==="
           pm2 delete scratchclothing || true

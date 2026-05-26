@@ -65,7 +65,7 @@ export default async function HomePage() {
         <div className="hero__noise" />
 
         <div className="hero__content">
-          {/* <span className="hero__eyebrow">Premium Streetwear — UK</span> */}
+          <span className="hero__eyebrow">MMXVII x EST.26</span>
           <h1 className="hero__title">
             BUILT FOR THE CULTURE
           </h1>

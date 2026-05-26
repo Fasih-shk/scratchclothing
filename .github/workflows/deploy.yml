@@ -13,6 +13,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup persistent uploads directory
+        run: |
+          # Create persistent uploads directory outside checkout
+          mkdir -p ../uploads
+          
+          # If public/uploads exists, is a directory, and is NOT a symlink
+          if [ -d public/uploads ] && [ ! -L public/uploads ]; then
+            echo "Moving existing uploads to persistent directory..."
+            cp -r public/uploads/* ../uploads/ 2>/dev/null || true
+            rm -rf public/uploads
+          fi
+          
+          # Create symlink
+          ln -sfn ../uploads public/uploads
+
       - name: Create .env.local
         run: |
           set -e

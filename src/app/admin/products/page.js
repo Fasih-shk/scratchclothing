@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useAuthStore } from '@/context/AuthContext';
 
 const API_URL = '/api/admin/products';
 
 export default function AdminProducts() {
+  const token = useAuthStore((state) => state.token);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,7 +30,11 @@ export default function AdminProducts() {
       if (categoryFilter) params.append('category', categoryFilter);
       if (statusFilter) params.append('status', statusFilter);
 
-      const res = await fetch(`${API_URL}?${params}`);
+      const res = await fetch(`${API_URL}?${params}`, {
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
       const data = await res.json();
       
       if (data.success) {
@@ -41,7 +47,7 @@ export default function AdminProducts() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, categoryFilter, statusFilter]);
+  }, [page, search, categoryFilter, statusFilter, token]);
 
   useEffect(() => {
     fetchProducts();
@@ -79,7 +85,10 @@ export default function AdminProducts() {
 
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
         body: JSON.stringify(formData),
       });
 
@@ -101,7 +110,12 @@ export default function AdminProducts() {
     if (!deletingProduct) return;
 
     try {
-      const res = await fetch(`${API_URL}/${deletingProduct._id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_URL}/${deletingProduct._id}`, { 
+        method: 'DELETE',
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
       const data = await res.json();
 
       if (data.success) {
@@ -121,7 +135,10 @@ export default function AdminProducts() {
     try {
       const res = await fetch(`${API_URL}/${product._id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
         body: JSON.stringify({ status: newStatus }),
       });
 
@@ -371,6 +388,7 @@ export default function AdminProducts() {
 
 // Product Modal Component
 function ProductModal({ product, categories, onSave, onClose }) {
+  const token = useAuthStore((state) => state.token);
   const [formData, setFormData] = useState({
     name: product?.name || '',
     slug: product?.slug || '',
@@ -455,6 +473,9 @@ function ProductModal({ product, categories, onSave, onClose }) {
 
         const res = await fetch('/api/upload', {
           method: 'POST',
+          headers: {
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
           body: uploadData
         });
         const data = await res.json();

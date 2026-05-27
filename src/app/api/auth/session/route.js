@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
-import { verifyToken } from '@/lib/auth';
+import { verifyToken, isAdminEmail } from '@/lib/auth';
 
 export async function GET(request) {
   try {
@@ -42,6 +42,8 @@ export async function GET(request) {
       );
     }
 
+    const role = user.role === 'admin' && !isAdminEmail(user.email) ? 'customer' : user.role;
+
     return NextResponse.json({
       success: true,
       user: {
@@ -50,7 +52,7 @@ export async function GET(request) {
         firstName: user.firstName,
         lastName: user.lastName,
         phone: user.phone,
-        role: user.role,
+        role,
         isVerified: user.isVerified,
         avatar: user.avatar,
         currency: user.currency,

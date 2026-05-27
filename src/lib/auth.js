@@ -62,7 +62,7 @@ export async function authenticateAdmin(request) {
     return { error: 'Account is disabled', status: 401 };
   }
 
-  if (user.role !== 'admin') {
+  if (user.role !== 'admin' || !isAdminEmail(user.email)) {
     return { error: 'Admin access required', status: 403 };
   }
 
@@ -73,6 +73,12 @@ export function generateReferralCode() {
   return 'MD' + crypto.randomBytes(3).toString('hex').toUpperCase();
 }
 
+export function isAdminEmail(email) {
+  if (!email) return false;
+  const ALLOWED_ADMIN_EMAILS = ['fasihmunir12@gmail.com', 'info@munidrip.com'];
+  return ALLOWED_ADMIN_EMAILS.includes(email.toLowerCase());
+}
+
 export default {
   generateToken,
   verifyToken,
@@ -80,4 +86,5 @@ export default {
   comparePassword,
   generateOTP,
   generateResetToken,
+  isAdminEmail,
 };

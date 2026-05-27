@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
-import { hashPassword, generateToken } from '@/lib/auth';
+import { hashPassword, generateToken, isAdminEmail } from '@/lib/auth';
 
 export async function POST(request) {
   try {
@@ -43,10 +43,12 @@ export async function POST(request) {
       resetPasswordExpiry: null,
     });
 
+    const role = user.role === 'admin' && !isAdminEmail(user.email) ? 'customer' : user.role;
+
     const newToken = generateToken({
       userId: user._id,
       email: user.email,
-      role: user.role,
+      role,
     });
 
     return NextResponse.json({

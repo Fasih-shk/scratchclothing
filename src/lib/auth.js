@@ -37,6 +37,13 @@ export function generateResetToken() {
   return crypto.randomBytes(32).toString('hex');
 }
 
+// Must be defined before authenticateAdmin which calls it
+export function isAdminEmail(email) {
+  if (!email) return false;
+  const ALLOWED_ADMIN_EMAILS = ['fasihmunir12@gmail.com', 'info@munidrip.com'];
+  return ALLOWED_ADMIN_EMAILS.includes(email.toLowerCase());
+}
+
 export async function authenticateAdmin(request) {
   const authHeader = request.headers.get('authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -71,12 +78,6 @@ export async function authenticateAdmin(request) {
 
 export function generateReferralCode() {
   return 'MD' + crypto.randomBytes(3).toString('hex').toUpperCase();
-}
-
-export function isAdminEmail(email) {
-  if (!email) return false;
-  const ALLOWED_ADMIN_EMAILS = ['fasihmunir12@gmail.com', 'info@munidrip.com'];
-  return ALLOWED_ADMIN_EMAILS.includes(email.toLowerCase());
 }
 
 export default {

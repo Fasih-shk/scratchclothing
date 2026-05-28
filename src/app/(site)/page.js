@@ -10,9 +10,9 @@ import Product from '@/models/Product';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Scratch® | Started from Scratch, Worn by Hustlers',
+  title: 'MUNI DRIP | Started from Scratch, Worn by Hustlers',
   description:
-    'Scratch was built from nothing and became something. Premium streetwear for those who came from nothing and built their empire.',
+    'MUNI DRIP was built from nothing and became something. Premium streetwear for those who came from nothing and built their empire.',
 };
 
 const marqueeItems = [

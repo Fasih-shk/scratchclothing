@@ -3,6 +3,9 @@ import Order from "@/models/Order";
 import User from "@/models/User";
 import OrdersClient from "./OrdersClient";
 
+export const dynamic = 'force-dynamic';
+
+
 export default async function AdminOrders() {
   if (!process.env.MONGODB_URI) {
     console.warn(
@@ -31,6 +34,7 @@ export default async function AdminOrders() {
     grandTotal: `${order.currency || "GBP"} ${(order.total || 0).toFixed(2)}`,
     orderStatus: order.status || "pending",
     paymentStatus: order.paymentStatus || "pending",
+    couponCode: order.couponCode || null,
   }));
 
   return <OrdersClient initialOrders={formattedOrders} />;

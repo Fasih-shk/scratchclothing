@@ -58,7 +58,7 @@ export function ThemeProvider({ children }) {
                   setTheme(data.theme);
                 }
               },
-              { timeout: 6000, enableHighAccuracy: false }
+              { timeout: 15000, enableHighAccuracy: true }
             );
           } else {
             // Static admin-set theme or geolocation not available
@@ -72,7 +72,7 @@ export function ThemeProvider({ children }) {
       }
     };
     syncTheme();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run only once on mount
 
   useEffect(() => {

@@ -2,7 +2,10 @@ import connectDB from '@/lib/mongodb';
 import Order from '@/models/Order';
 import Product from '@/models/Product';
 import User from '@/models/User';
+import Subscriber from '@/models/Subscriber';
 import ThemeSelector from '@/components/ThemeSelector';
+export const dynamic = 'force-dynamic';
+
 
 function pillClass(status) {
   if (status === 'completed' || status === 'paid' || status === 'Completed' || status === 'Paid') return 'admin-pill admin-pill--success';
@@ -16,6 +19,7 @@ export default async function AdminDashboard() {
   // 1. Dashboard Stats
   const orders = await Order.find();
   const products = await Product.find();
+  const subscriberCount = await Subscriber.countDocuments();
 
   let grossSales = 0;
   let netSales = 0;
@@ -54,12 +58,19 @@ export default async function AdminDashboard() {
       trendDirection: openOrdersCount > 0 ? 'up' : 'down',
     },
     {
+      label: 'Subscribers',
+      value: subscriberCount.toString(),
+      trend: 'Newsletter signups',
+      trendDirection: 'up',
+    },
+    {
       label: 'Low Stock SKUs',
       value: lowStockCount.toString(),
       trend: 'Require reorder',
       trendDirection: 'down',
     },
   ];
+
 
   // 2. Monthly Sales (Aggregate)
   const monthlySalesRaw = await Order.aggregate([
@@ -149,9 +160,10 @@ export default async function AdminDashboard() {
     warehouse: 'Main Warehouse'
   }));
 
-  // 6. Activity Feed (Mapping from recent orders)
-  const activityFeed = recentOrdersRaw.map(order => {
-    // Generate a human-readable time ago
+  // 6. Activity Feed (Mapping from recent orders and recent subscribers)
+  const recentSubscribersRaw = await Subscriber.find().sort({ createdAt: -1 }).limit(5);
+
+  const orderActivities = recentOrdersRaw.map(order => {
     const timeDiff = Date.now() - new Date(order.createdAt).getTime();
     const hours = Math.floor(timeDiff / (1000 * 60 * 60));
     const minutes = Math.floor(timeDiff / (1000 * 60));
@@ -160,9 +172,29 @@ export default async function AdminDashboard() {
     return {
       action: `Order ${order.orderNumber} placed`,
       user: order.email || 'customer',
-      time: timeStr
+      time: timeStr,
+      timestamp: new Date(order.createdAt).getTime()
     };
   });
+
+  const subscriberActivities = recentSubscribersRaw.map(sub => {
+    const timeDiff = Date.now() - new Date(sub.createdAt).getTime();
+    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+    const minutes = Math.floor(timeDiff / (1000 * 60));
+    const timeStr = hours > 24 ? `${Math.floor(hours/24)} days ago` : hours > 0 ? `${hours} hours ago` : `${minutes} mins ago`;
+
+    return {
+      action: `Subscribed to newsletter`,
+      user: `${sub.firstName} (${sub.email})`,
+      time: timeStr,
+      timestamp: new Date(sub.createdAt).getTime()
+    };
+  });
+
+  const activityFeed = [...orderActivities, ...subscriberActivities]
+    .sort((a, b) => b.timestamp - a.timestamp)
+    .slice(0, 5);
+
 
   return (
     <div>

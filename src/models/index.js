@@ -10,3 +10,5 @@ export { default as Inventory } from './Inventory.js';
 export { default as InventoryHistory } from './InventoryHistory.js';
 export { default as Coupon } from './Coupon.js';
 export { default as Return } from './Return.js';
+export { default as Setting } from './Setting.js';
+

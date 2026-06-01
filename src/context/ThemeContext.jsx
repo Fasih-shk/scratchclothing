@@ -26,6 +26,54 @@ const useThemeStore = create(
 
 export function ThemeProvider({ children }) {
   const theme = useThemeStore((state) => state.theme);
+  const setTheme = useThemeStore((state) => state.setTheme);
+
+  useEffect(() => {
+    const syncTheme = async () => {
+      try {
+        const res = await fetch('/api/theme');
+        if (res.ok) {
+          const data = await res.json();
+
+          // isAutoMode means the global setting is 'auto' — always prompt for GPS
+          if (data.isAutoMode && typeof navigator !== 'undefined' && navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              async (position) => {
+                const { latitude, longitude } = position.coords;
+                try {
+                  const geoRes = await fetch(`/api/theme?lat=${latitude}&lon=${longitude}`);
+                  if (geoRes.ok) {
+                    const geoData = await geoRes.json();
+                    if (geoData.theme) {
+                      setTheme(geoData.theme);
+                    }
+                  }
+                } catch (err) {
+                  console.error('Failed to resolve theme with client coordinates:', err);
+                }
+              },
+              (error) => {
+                console.warn('Geolocation denied. Using server fallback:', error.message);
+                if (data.theme) {
+                  setTheme(data.theme);
+                }
+              },
+              { timeout: 6000, enableHighAccuracy: false }
+            );
+          } else {
+            // Static admin-set theme or geolocation not available
+            if (data.theme) {
+              setTheme(data.theme);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error syncing theme with server:', err);
+      }
+    };
+    syncTheme();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run only once on mount
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -35,6 +83,7 @@ export function ThemeProvider({ children }) {
 
   return children;
 }
+
 
 export function useTheme() {
   const theme = useThemeStore((state) => state.theme);

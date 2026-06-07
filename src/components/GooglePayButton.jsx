@@ -12,7 +12,7 @@ export default function MyGooglePayButton({ totalPrice }) {
 
   return (
     <GooglePayButton
-      environment={isLive ? "PRODUCTION" : "TEST"}
+      environment="PRODUCTION"
       buttonColor="black"
       buttonType="buy"
       paymentRequest={{

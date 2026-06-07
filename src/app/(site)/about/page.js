@@ -11,7 +11,7 @@ export default function AboutPage() {
       {/* Hero */}
       <div className="about-page__hero">
         <p className="section-eyebrow" style={{ marginBottom: '1rem' }}>Who We Are</p>
-        <h1 className="about-page__hero-title">We all started from Zero.</h1>
+        <h1 className="about-page__hero-title">MUNI DRIP DAILY?.</h1>
         <p className="about-page__hero-body">
           MUNI DRIP WAS BUILT FROM NOTHING AND BECAME SOMETHING — FOR THE BROTHERS AND SISTERS
           WHO CAME FROM THE SAME. THIS IS MORE THAN FASHION. EVERY STITCH, EVERY DROP, EVERY

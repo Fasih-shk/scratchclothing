@@ -58,7 +58,7 @@ export function ThemeProvider({ children }) {
                   setTheme(data.theme);
                 }
               },
-              { timeout: 15000, enableHighAccuracy: true }
+              { timeout: 6000, enableHighAccuracy: false }
             );
           } else {
             // Static admin-set theme or geolocation not available

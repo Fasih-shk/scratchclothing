@@ -8,9 +8,11 @@ export default function MyGooglePayButton({ totalPrice }) {
   // Ensure we format the price correctly (must be a string for Google Pay)
   const formattedPrice = Number(totalPrice).toFixed(2).toString();
 
+  const isLive = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith('pk_live');
+
   return (
     <GooglePayButton
-      environment="TEST" // Change to "PRODUCTION" when ready to go live
+      environment={isLive ? "PRODUCTION" : "TEST"}
       buttonColor="black"
       buttonType="buy"
       paymentRequest={{

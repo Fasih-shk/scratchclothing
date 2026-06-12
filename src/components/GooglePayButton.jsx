@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import GooglePayButton from '@google-pay/button-react';
 import Swal from 'sweetalert2';
 
@@ -8,14 +8,16 @@ export default function MyGooglePayButton({ totalPrice }) {
   // Ensure we format the price correctly (must be a string for Google Pay)
   const formattedPrice = Number(totalPrice).toFixed(2).toString();
 
-  const isLive = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith('pk_live');
-  
-  // To avoid OR_BIBED_11 on localhost, Google Pay requires 'TEST' environment. 
-  // However, Stripe Live keys will reject TEST tokens. 
-  // For actual live testing, you must test on your verified production domain.
-  const environment = isLive && typeof window !== 'undefined' && window.location.hostname !== 'localhost' 
-    ? 'PRODUCTION' 
-    : 'TEST';
+  const [environment, setEnvironment] = useState('TEST');
+
+  useEffect(() => {
+    const isLive = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith('pk_live');
+    if (isLive && window.location.hostname !== 'localhost') {
+      setEnvironment('PRODUCTION');
+    } else {
+      setEnvironment('TEST');
+    }
+  }, []);
 
   return (
     <GooglePayButton

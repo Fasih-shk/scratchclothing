@@ -9,10 +9,17 @@ export default function MyGooglePayButton({ totalPrice }) {
   const formattedPrice = Number(totalPrice).toFixed(2).toString();
 
   const isLive = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith('pk_live');
+  
+  // To avoid OR_BIBED_11 on localhost, Google Pay requires 'TEST' environment. 
+  // However, Stripe Live keys will reject TEST tokens. 
+  // For actual live testing, you must test on your verified production domain.
+  const environment = isLive && typeof window !== 'undefined' && window.location.hostname !== 'localhost' 
+    ? 'PRODUCTION' 
+    : 'TEST';
 
   return (
     <GooglePayButton
-      environment="PRODUCTION"
+      environment={environment}
       buttonColor="black"
       buttonType="buy"
       paymentRequest={{
@@ -36,7 +43,8 @@ export default function MyGooglePayButton({ totalPrice }) {
           },
         ],
         merchantInfo: {
-          merchantId: 'BCR2DN7T7C277ZC6', // Your actual Google Pay Merchant ID
+          // You must use your actual Merchant ID in production.
+          merchantId: 'BCR2DN7T7C277ZC6', 
           merchantName: 'Scratch Clothing',
         },
         transactionInfo: {

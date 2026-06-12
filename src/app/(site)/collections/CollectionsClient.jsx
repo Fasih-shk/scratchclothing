@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import ProductCard from '@/components/ProductCard';
 
-export default function CollectionsClient({ initialProducts, initialCategories, title = "The Collection", subtitle = "Built for hustle. Worn with pride. Every piece tells a story — yours." }) {
+export default function CollectionsClient({ initialProducts, initialCategories, title = "The Collection", subtitle = "Built for hustle. Worn with pride. Every piece tells a STORY — YOURS." }) {
   const [activeCategory, setActiveCategory] = useState('All');
   const [sortBy, setSortBy] = useState('default');
 

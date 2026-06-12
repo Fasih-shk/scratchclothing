@@ -9,7 +9,7 @@ export default function MyPayPalButton({ totalPrice }) {
   const formattedPrice = Number(totalPrice).toFixed(2).toString();
 
   const initialOptions = {
-    "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "test",
+    "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
     currency: "GBP",
     intent: "capture",
   };

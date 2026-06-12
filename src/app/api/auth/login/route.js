@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
-import { comparePassword, generateOTP } from '@/lib/auth';
+import { comparePassword, generateOTP, generateToken, isAdminEmail } from '@/lib/auth';
 import { sendVerificationEmail } from '@/lib/email';
 
 export async function POST(request) {
@@ -42,7 +42,33 @@ export async function POST(request) {
       );
     }
 
-    // Generate and send OTP for login verification
+    // If the user is already verified, bypass OTP and log them in directly
+    // Sanitize role: only allowed admin emails can have admin role in the token
+    const role = user.role === 'admin' && !isAdminEmail(user.email) ? 'customer' : user.role;
+
+    if (user.isVerified) {
+      const token = generateToken({
+        userId: user._id,
+        email: user.email,
+        role,
+      });
+
+      return NextResponse.json({
+        success: true,
+        requiresOTP: false,
+        token,
+        user: {
+          _id: user._id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role,
+          isVerified: user.isVerified,
+        },
+      });
+    }
+
+    // Generate and send OTP for login verification for unverified users
     const otp = generateOTP();
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
@@ -62,7 +88,7 @@ export async function POST(request) {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role,
+        role,
         isVerified: user.isVerified,
       },
     });

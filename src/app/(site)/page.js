@@ -7,10 +7,12 @@ import SeasonalProducts from '@/components/SeasonalProducts';
 import connectDB from '@/lib/mongodb';
 import Product from '@/models/Product';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
-  title: 'Scratch® | Started from Scratch, Worn by Hustlers',
+  title: 'MUNI DRIP | Started from Scratch, Worn by Hustlers',
   description:
-    'Scratch was built from nothing and became something. Premium streetwear for those who came from nothing and built their empire.',
+    'MUNI DRIP was built from nothing and became something. Premium streetwear for those who came from nothing and built their empire.',
 };
 
 const marqueeItems = [
@@ -63,7 +65,7 @@ export default async function HomePage() {
         <div className="hero__noise" />
 
         <div className="hero__content">
-          {/* <span className="hero__eyebrow">Premium Streetwear — UK</span> */}
+          <span className="hero__eyebrow">MMXVII x EST.26</span>
           <h1 className="hero__title">
             BUILT FOR THE CULTURE
           </h1>

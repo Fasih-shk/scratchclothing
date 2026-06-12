@@ -35,7 +35,8 @@ export async function POST(request) {
       resetPasswordExpiry: resetExpiry,
     });
 
-    await sendPasswordResetEmail(user.email, resetToken);
+    const origin = request.headers.get('origin') || new URL(request.url).origin;
+    await sendPasswordResetEmail(user.email, resetToken, origin);
 
     return NextResponse.json({
       success: true,

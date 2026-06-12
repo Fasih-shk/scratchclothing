@@ -3,6 +3,8 @@ import Product from "@/models/Product";
 import Category from "@/models/Category";
 import CollectionsClient from "./CollectionsClient";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: "The Collection | Scratch®",
   description:

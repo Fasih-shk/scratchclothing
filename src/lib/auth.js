@@ -37,6 +37,13 @@ export function generateResetToken() {
   return crypto.randomBytes(32).toString('hex');
 }
 
+// Must be defined before authenticateAdmin which calls it
+export function isAdminEmail(email) {
+  if (!email) return false;
+  const ALLOWED_ADMIN_EMAILS = ['fasihmunir12@gmail.com', 'info@munidrip.com'];
+  return ALLOWED_ADMIN_EMAILS.includes(email.toLowerCase());
+}
+
 export async function authenticateAdmin(request) {
   const authHeader = request.headers.get('authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -62,7 +69,7 @@ export async function authenticateAdmin(request) {
     return { error: 'Account is disabled', status: 401 };
   }
 
-  if (user.role !== 'admin') {
+  if (user.role !== 'admin' || !isAdminEmail(user.email)) {
     return { error: 'Admin access required', status: 403 };
   }
 
@@ -80,4 +87,5 @@ export default {
   comparePassword,
   generateOTP,
   generateResetToken,
+  isAdminEmail,
 };

@@ -23,7 +23,6 @@ export default function CartDrawer() {
 
   const paymentGateways = [
     { id: 'paypal', name: 'PayPal', icon: 'PP', bg: '#003087', color: '#ffffff' },
-    { id: 'applepay', name: 'Apple Pay', icon: '[A]', bg: '#111111', color: '#ffffff' },
     { id: 'googlepay', name: 'Google Pay', icon: 'G', bg: '#ffffff', color: '#1f1f1f', border: '1px solid #dadce0' },
     { id: 'shopify', name: 'Shopify', icon: 'S', bg: '#95bf47', color: '#ffffff' },
   ];

@@ -6,7 +6,7 @@ const transporter = nodemailer.createTransport({
   secure: false,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
+    pass: process.env.EMAIL_PASSWORD ? process.env.EMAIL_PASSWORD.replace(/\s+/g, '') : '',
   },
   tls: {
     rejectUnauthorized: false,
@@ -45,8 +45,9 @@ export async function sendVerificationEmail(to, otp) {
   return sendEmail({ to, subject, html });
 }
 
-export async function sendPasswordResetEmail(to, resetToken) {
-  const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/auth/reset-password?token=${resetToken}`;
+export async function sendPasswordResetEmail(to, resetToken, origin) {
+  const siteUrl = origin || process.env.NEXT_PUBLIC_SITE_URL;
+  const resetUrl = `${siteUrl}/reset-password?token=${resetToken}`;
   const subject = 'Reset your MuniDrip password';
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

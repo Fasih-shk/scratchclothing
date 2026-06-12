@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import GooglePayButton from '@google-pay/button-react';
 import Swal from 'sweetalert2';
 
@@ -8,9 +8,20 @@ export default function MyGooglePayButton({ totalPrice }) {
   // Ensure we format the price correctly (must be a string for Google Pay)
   const formattedPrice = Number(totalPrice).toFixed(2).toString();
 
+  const [environment, setEnvironment] = useState('TEST');
+
+  useEffect(() => {
+    const isLive = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.startsWith('pk_live');
+    if (isLive && window.location.hostname !== 'localhost') {
+      setEnvironment('PRODUCTION');
+    } else {
+      setEnvironment('TEST');
+    }
+  }, []);
+
   return (
     <GooglePayButton
-      environment="TEST" // Change to "PRODUCTION" when ready to go live
+      environment={environment}
       buttonColor="black"
       buttonType="buy"
       paymentRequest={{
@@ -34,7 +45,8 @@ export default function MyGooglePayButton({ totalPrice }) {
           },
         ],
         merchantInfo: {
-          merchantId: 'BCR2DN7T7C277ZC6', // Your actual Google Pay Merchant ID
+          // You must use your actual Merchant ID in production.
+          merchantId: 'BCR2DN7T7C277ZC6', 
           merchantName: 'Scratch Clothing',
         },
         transactionInfo: {

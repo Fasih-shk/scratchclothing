@@ -13,6 +13,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup persistent uploads directory
+        run: |
+          # Create persistent uploads directory outside checkout
+          mkdir -p /var/www/scratchclothing.co.uk/uploads
+          
+          # If public/uploads exists (either as a folder or a symlink), remove it to prevent Turbopack build errors.
+          # The custom Next.js fallback uploads API route will serve files dynamically from the persistent directory.
+          if [ -d public/uploads ] || [ -L public/uploads ]; then
+            echo "Removing public/uploads to prevent Turbopack build errors..."
+            if [ -d public/uploads ] && [ ! -L public/uploads ]; then
+              cp -r public/uploads/* /var/www/scratchclothing.co.uk/uploads/ 2>/dev/null || true
+            fi
+            rm -rf public/uploads
+          fi
+
       - name: Create .env.local
         run: |
           set -e
@@ -32,6 +47,7 @@ jobs:
           printf 'NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN=%s\n' "${{ secrets.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN }}" >> .env.local
           printf 'NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN=%s\n' "${{ secrets.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN }}" >> .env.local
           printf 'SHOPIFY_ADMIN_API_KEY=%s\n' "${{ secrets.SHOPIFY_ADMIN_API_KEY }}" >> .env.local
+          printf 'UPLOAD_DIR=/var/www/scratchclothing.co.uk/uploads\n' >> .env.local
 
       - name: Install dependencies
         run: npm install
@@ -58,5 +74,13 @@ jobs:
 
       - name: Restart PM2
         run: |
-          pm2 restart scratchclothing || pm2 start npm --name "scratchclothing" -- start
+          echo "=== PM2 STATUS BEFORE ==="
+          pm2 status
+          
+          echo "=== DELETING OLD PM2 PROCESS ==="
+          pm2 delete scratchclothing || true
+          echo "=== STARTING NEW PM2 PROCESS FROM WORKSPACE ==="
+          pm2 start npm --name "scratchclothing" --cwd "${{ github.workspace }}" -- start
+          echo "=== PM2 STATUS AFTER ==="
+          pm2 status
           pm2 save

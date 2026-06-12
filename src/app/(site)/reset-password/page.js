@@ -15,7 +15,11 @@ export default function ResetPasswordPage() {
   
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    setToken(params.get('token') || '');
+    const tokenParam = params.get('token') || '';
+    setToken(tokenParam);
+    if (!tokenParam) {
+      setError('Invalid or missing password reset token. Please request a new link.');
+    }
   }, []);
 
   const {

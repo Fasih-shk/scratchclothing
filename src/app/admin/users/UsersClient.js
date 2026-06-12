@@ -76,6 +76,7 @@ export default function UsersClient({ initialCustomers }) {
             <option value="All">All segments</option>
             <option value="Retail">Retail</option>
             <option value="Wholesale">Wholesale</option>
+            <option value="Subscriber">Subscriber</option>
           </select>
           <div style={{ display: 'none' }} />
           <button className="admin-btn">

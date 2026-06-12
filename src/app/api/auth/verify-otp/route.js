@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
-import { generateToken } from '@/lib/auth';
+import { generateToken, isAdminEmail } from '@/lib/auth';
 
 export async function POST(request) {
   try {
@@ -48,10 +48,12 @@ export async function POST(request) {
       otpExpiry: null,
     });
 
+    const role = user.role === 'admin' && !isAdminEmail(user.email) ? 'customer' : user.role;
+
     const token = generateToken({
       userId: user._id,
       email: user.email,
-      role: user.role,
+      role,
     });
 
     return NextResponse.json({
@@ -63,6 +65,7 @@ export async function POST(request) {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        role,
         isVerified: true,
       },
     });

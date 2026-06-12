@@ -199,7 +199,7 @@ orderSchema.index({ createdAt: -1 });
 orderSchema.index({ email: 1 });
 
 // Generate order number on creation
-orderSchema.pre('save', async function (next) {
+orderSchema.pre('save', async function () {
   if (this.isNew && !this.orderNumber) {
     const count = await this.constructor.countDocuments();
     const date = new Date();
@@ -207,7 +207,9 @@ orderSchema.pre('save', async function (next) {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     this.orderNumber = `ORD-${year}${month}-${String(count + 1).padStart(6, '0')}`;
   }
-  next();
 });
 
-export default mongoose.models.Order || mongoose.model('Order', orderSchema);
+if (mongoose.models.Order) {
+  delete mongoose.models.Order;
+}
+export default mongoose.model('Order', orderSchema);
